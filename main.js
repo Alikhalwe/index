@@ -1,224 +1,168 @@
-var dealinguri = "http://whatismyspecialday.com/rc20_se";
-var suggestions_dealinguri = "http://whatismyspecialday.com/h1_sugg";
+﻿var dealinguri = "http://btakoss.com:8000/proc";
+var suggestions_dealinguri = "http://btakoss.com:8000/prosugg";
 
 var pictureSource;   // picture source
-var destinationType; // sets the format of returned value
+var destinationType; // sets the format of returned value 
 var loadmorecounter = 0;
 
 
-var ads_dealinguri = "http://gawgle.com/adscentral/";
-
-
-function getadynamdata() {
-
-    Ajax.call({
-        url: ads_dealinguri + "adsmgr/filltheadsarea_html/",
-        cache: false,
-        type: 'GET',
-        async: true,
-        data: {
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_app_version').val(),
-            platform: $('#txt_platform').val(),
-            fakeappname: $('#txt_app_name').val(),
-            AppName: $('#txt_app_name').val()
-
-        },
-        success: function (data) {
-            if (data != "") {
-                $('#dvdynamicserverads').html(data);
-
-            }
-
-        },
-        error: function (error) {
-
-        },
-        complete: function () {
-
-        }
-    });
-}
-
-
 function back_to_home() {
+    $('#random_people').css('display', '');
+
     $('#Register').css('display', 'none');
     $('#near_by_locations').css('display', 'none');
     $('#places_result').css('display', 'none');
     $('#search_result').css('display', 'none');
-    $('#contacts_in_common').css('display', 'none');
+    $('#my_friend_profile').css('display', 'none');
     $('#places_result_effect').html('');
+    $('#hot_search_result').css('display', 'none');
+    $('#search_history').css('display', 'none');
+    $('#my_friend').css('display', 'none');
+    get_random_social_people();
+}
+
+function back_to_home_places() {
+    $('#random_people').css('display', 'none');
+    $('#Register').css('display', 'none');
+    $('#near_by_locations').css('display', '');
+    $('#places_result').css('display', 'none');
+    $('#search_result').css('display', 'none');
+    $('#my_friend_profile').css('display', 'none');
+
+    $('#places_result_effect').html('');
+    $('#hot_search_result').css('display', 'none');
+    $('#search_history').css('display', 'none');
+    $('#my_friend').css('display', 'none');
+}
+
+function back_to_home_only() {
+    $('#random_people').css('display', '');
+
+    $('#Register').css('display', 'none');
+    $('#near_by_locations').css('display', 'none');
+    $('#places_result').css('display', 'none');
+    $('#search_result').css('display', 'none');
+    $('#my_friend_profile').css('display', 'none');
+    $('#places_result_effect').html('');
+    $('#hot_search_result').css('display', 'none');
+    $('#search_history').css('display', 'none');
+    $('#my_friend').css('display', 'none');
+}
+
+function link_ppl_images() {
+    $('.img_w_ppl').unbind('click');
+    $('.img_w_ppl').bind('click', function () {
+
+        $('#img_full_w_share_app_modal__people').attr('src', $(this).attr('src').replace('thumbs', 'original'));
+        $('#lbl_full_ModalLabel_share_app_modal__people').html($(this).attr('custname'));
+        $('#lbl_full_phone_share_app_modal__people').html("<a href='tel:" + $(this).attr('custtel') + "'>" + $(this).attr('custtel') + "</a>");
+
+        $('#share_app_modal__people').modal('show');
+    });
+
+
+    $('.btn_share_search_result').unbind('click');
+    $('.btn_share_search_result').bind('click', function () {
+
+        var text_to_share = "";
+        text_to_share = $(this).parent().text();
+        AndroidFunction.share(text_to_share, "Procaller");
+    });
+
+
+    Pleasure.init();
 
 }
 
-function close_main_subscription_layer()
+function backpressed()
 {
+    var visibles_count=0;
+    $('.modal').each(function(i, obj) {
+        var isVisible = $(this).is(':visible');
+        var isHidden = $(this).is(':hidden');
+        if(isVisible)
+        {
+            $(this).modal('hide');
+            visibles_count++;
+        }
+    });
 
-    $('#mainsubscriptionsystem').hide('slidedown');
 
-    myScroll.refresh();
+    if($('#near_by_locations').is(':visible'))
+    {
+        back_to_home_only();
+        visibles_count++;
+    }
 
-    event.stopPropagation();
-    event.preventDefault();
+       if($('#places_result').is(':visible'))
+         {
+             $('#places_result_back').trigger('click');
+             visibles_count++;
+         }
+
+    if($('#hot_search_result').is(':visible'))
+    {
+        back_to_home_only();
+        visibles_count++;
+    }
+    if($('#my_friend').is(':visible'))
+    {
+        back_to_home_only();
+        visibles_count++;
+    }
+    if($('#search_result').is(':visible'))
+    {
+        back_to_home_only();
+        visibles_count++;
+    }
+        if($('#search_history').is(':visible'))
+           {
+                     back_to_home_only();
+               visibles_count++;
+           }
+
+    if($('#my_friend_profile').is(':visible'))
+    {
+        $('#my_friend_profile_result_back').trigger('click');
+        visibles_count++;
+    }
+
+    if(visibles_count==0)
+    {
+        AndroidFunction.repressback("");
+    }
+
 }
 
 $(document).ready(function () {
 
-    getpointscenter_quick();
+  //  getpointscenter();
 
-    $('.in_app_item').bind('click', function () {
-        try {
-            AndroidFunction.trigger_in_app($(this).attr("cust_in_app_id"));
-        }
-        catch (ex) {
-            console.log(ex);
-        }
+    $('#btn_get_more_coins_in_app_1').bind('touchend', function () {
+        AndroidFunction.triggertheinapp500coins("");
     });
 
-     $('#btn_in_app_subscription_item').bind('touchend', function () {
-
-
-            $('#mainsubscriptionsystem').show('slideup');
-
-     });
-
-     $('#btn_get_pro_subscription_in_app').bind('touchend',function(){
-
-        if (($('#txt_devuid').val() != "") && ($('#inptsrvuid').val() == "")) {
-               check_for_my_identity_on_the_server();
-        }
-
-        if ($('#phonenbr').val() == "") {
-              $('#txt_verification_reason').val("pro");
-              close_main_subscription_layer();
-              $('#phone_number__not_verified_modal').openModal();
-               return;
-        }
-
-        try {
-               AndroidFunction.trigger_in_app($(this).attr("cust_in_app_id"));
-            }
-            catch (ex) {
-                console.log(ex);
-            }
-
-         });
-
-
-
-        $('#btnclosemainsubscriptionsystem').bind('touchend', function () {
-
-            $('#mainsubscriptionsystem').hide('slidedown');
-
-             event.stopPropagation();
-             event.preventDefault();
-
-        });
-
-
-
-
-
-    $('#btn_remove_ads_handler').bind('click', function (event) {
-
-        var cur_balance = eval($('#spnofrealbal').html());
-
-        if (cur_balance = 50) {
-            $('#no_enough_balance_modal').openModal();
-
-        }
-        else {
-            $('#remove_ads_from_app_modal').openModal();
-        }
-
-
+    $("#imgcountryflag").bind('touchend', function () {
+        AndroidFunction.open_country_selector("");
     });
-
-$('#btn_synch_contacts_handler').bind('click', function (event) {
-
-
-                                                        swal({
-                                                             title: "Are you sure?",
-                                                             text: "By clicking on Yes button, You agree to our terms and conditions to share and submit your contacts to our servers.",
-                                                             type: "warning",
-                                                             showCancelButton: true,
-                                                             confirmButtonColor: "#DD6B55",
-                                                             confirmButtonText: "Yes, sure!",
-                                                             closeOnConfirm: true
-                                                             },
-                                                             function () {
-                                                              AndroidFunction.ask_for_band_consuming("101");
-
-                                                            // swal("Congrats!", "Thank you for sharing your contacts", "success");
-                                                            // });
-
-                                                    });
-  });
-
-    $('#btn_my_profile_pic_container').bind('click', function (event) {
-
-        AndroidFunction.trigger_pic_changer("");
-
+    $("#spn_selected_country_code").bind('touchend', function () {
+        AndroidFunction.open_country_selector("");
     });
 
 
-    $('#left_side_menu_profile_pic').bind('click', function () {
-        $('#sidenav-overlay').trigger('click');
+    $('#lbl_header_country_name').off();
 
-        hide_all_layers();
-        show_a_layer('li_profile_page');
-        myScroll.refresh();
-
+    $('#lbl_header_country_name').bind('touchend', function () {
+        AndroidFunction.open_country_selector("");
     });
 
-    $('#side_of_side_yourname').bind('click', function () {
-        $('#sidenav-overlay').trigger('click');
 
-        hide_all_layers();
-        show_a_layer('li_profile_page');
-        myScroll.refresh();
 
+    $('#btn_coins_center_main_layer_button').bind('click', function () {
+        $('#coins_center_main_layer').modal('hide');
+        $('.nav-balance').trigger('click');
     });
 
-    $('#side_of_side_profile').bind('click', function () {
-        $('#sidenav-overlay').trigger('click');
-
-        hide_all_layers();
-        show_a_layer('li_profile_page');
-        myScroll.refresh();
-
-    });
-
-    $('#btn_contact_details_c_share').bind('click', function () {
-        var text_to_share = $('#txt_contact_details_c_text_to_share').val();
-        try {
-            AndroidFunction.share(text_to_share, "Arab Caller");
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-    });
-
-    $('#btn_menu_share_app').bind('click', function () {
-        var text_to_share = $('#outAppShareText').val();
-        try {
-            AndroidFunction.share_current_apps(text_to_share, "Arab Caller");
-
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-    });
- 
- $('#btn_menu_rate_app').bind('click', function () {
-        try {
-            AndroidFunction.rate_current_apps("Arab Caller");
-
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-    });
 
     $('#srch-term').autocomplete({
         lookup: function (query, done) {
@@ -262,6 +206,7 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
         }
     });
 
+    //get_random_social_people();
     $('#btn_report_a_number_submit_button').bind('click', function () {
 
         Ajax.call({
@@ -279,15 +224,15 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
             success: function (data) {
 
 
-                $('#report_a_number_modal').closeModal();
-                toast_it("Thank you, a report submitted to admin team.");
+                $('#report_a_number_modal').modal('hide');
+                AndroidFunction.toast_it("Thank you, a report submitted to admin team.");
 
             },
             error: function (error) {
 
-                $('#report_a_number_modal').closeModal();
+                $('#report_a_number_modal').modal('hide');
 
-                toast_it("Failed to send the report.");
+                AndroidFunction.toast_it("Failed to send the report.");
 
             },
             complete: function () {
@@ -298,6 +243,50 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
 
     });
+
+
+
+    $('#btn_edit_a_number_submit_button').bind('click', function () {
+
+        Ajax.call({
+            url: dealinguri + "/Users/edname",
+            cache: false,
+            type: 'GET',
+            async: true,
+            data: {
+                devuid: $('#txt_devuid').val(),
+                platform: $("#txt_platform").val(),
+                vers: $('#txt_version').val(),
+                dvuniqueuserid: $('#inptsrvuid').val(),
+                ed_id: $('#edit_a_number_modal_wanted_id').val(),
+                newv: $('#txt_edit_nick_name').val(),
+                clevel: $('#edit_a_number_modal_cur_level').val()
+            },
+            success: function (data) {
+
+                getpointscenter_quick();
+                $('#edit_a_number_modal').modal('hide');
+                toastr.success("شكرا لك ، تم تغيير الاسم بنجاح يرجى تحديث نتيجة البحث.");
+
+            },
+            error: function (error) {
+
+                $('#edit_a_number_modal').modal('hide');
+
+                toastr.error("Failed to edit your name.");
+
+            },
+            complete: function () {
+
+            }
+        });
+
+
+
+    });
+
+
+
 
     $('#btn_activate_deactivate_submit_button').bind('click', function () {
 
@@ -316,20 +305,23 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
             success: function (data) {
 
 
-                $('#activate_deactivate_modal').closeModal();
-                send_to_native();
+                $('#activate_deactivate_modal').modal('hide');
+                AndroidFunction.change_acc_status($('#txt_next_account_status').val());
+                AndroidFunction.toast_it("شكرا لك ، لقد تم تغيير حالة حسابك.");
 
-                toast_it("Thank you, your account status has been changed.");
-
-
+                try {
+                    AndroidFunction.device_ready();
+                }
+                catch (err) {
+                }
 
                 back_to_home();
             },
             error: function (error) {
 
-                $('#activate_deactivate_modal').closeModal();
+                $('#activate_deactivate_modal').modal('hide');
 
-                toast_it("Failed to change your account status, please try again.");
+                AndroidFunction.toast_it("Failed to change your account status, please try again.");
 
             },
             complete: function () {
@@ -341,9 +333,162 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
     });
 
+    $('#Logo').bind('click', function () {
+        back_to_home();
+    });
+    $('#left_menu_home').bind('click', function () {
+        $('.nav-menu').trigger('click');
+        back_to_home_only();
+
+    });
+
+
+    $('#left_menu_my_profile').bind('click', function () {
+        $('#li_rearch_result').css('display', 'none');
+        $('#li_rearch_result').css('display', 'none');
+        $('#phone_verification').css('display', 'none');
+        $('#li_synch_my_contacts').css('display', 'none');
+        $('#li_list_of_pre_words').css('display', 'none');
+        $('#random_people').css('display', 'none');
+        $('#profile_settings').css('display', 'none');
+        $('#hot_search_result').css('display', 'none');
+        $('#near_by_locations').css('display', 'none');
+        $('#search_result').css('display', 'none');
+        $('#my_friend_profile').css('display', 'none');
+        $('#places_result').css('display', 'none');
+        $('#search_history').css('display', 'none');
+        $('#my_friend').css('display', 'none');
+        $('#Register').css('display', '');
+
+    });
+
+    $('#left_menu_near_by_places').bind('click', function () {
+        $('.nav-menu').trigger('click');
+         back_to_home();
+        $('#random_people').css('display', 'none');
+        $('#li_rearch_result').css('display', 'none');
+        $('#phone_verification').css('display', 'none');
+        $('#li_synch_my_contacts').css('display', 'none');
+        $('#li_list_of_pre_words').css('display', 'none');
+        $('#hot_search_result').css('display', 'none');
+        $('#profile_settings').css('display', 'none');
+        $('#hot_search_result').css('display', 'none');
+        $('#search_history').css('display', 'none');
+        $('#my_friend').css('display', 'none');
+        $('#near_by_locations').css('display', '');
+    });
+
+    $('#left_menu_share_with_friends').bind('click', function () {
+        $('.nav-menu').trigger('click');
+        AndroidFunction.share($('#txt_share_dynamic_content').val(), "Pro caller");
+    });
+
+
+    $('#left_menu_remove_ads').bind('click', function () {
+
+
+        if (eval($("#hdncurbln").val()) > 0) {
+
+            $('.nav-menu').trigger('click');
+            $('#remove_ads_from_app_modal').modal('show');
+
+        }
+        else {
+
+            $('.nav-menu').trigger('click');
+            $('#coins_center_main_layer').modal('show');
+        }
+
+
+
+    });
+    $('#btn_remove_ads_from_app_modal_submit_button').bind('click', function () {
+
+        $('#remove_ads_from_app_modal').modal('hide');
+
+        Ajax.call({
+            url: dealinguri + "/balmanager/decrement_a_remove_ads_coins",
+            cache: false,
+            type: 'GET',
+            async: true,
+            data: {
+                devuid: $('#txt_devuid').val(),
+                vers: $('#txt_app_version').val(),
+                AppName: $("#txt_app_name").val(),
+                platform: $("#txt_platform").val(),
+                usuid: $("#inptsrvuid").val()
+            },
+            success: function (data) {
+                getpointscenter_quick();
+                AndroidFunction.remove_ads();
+                var time = new Date();
+                time.setDate(time.getDate() + 30);
+
+                toastr.success('Congrats, Procaller is ads free till ' + time + '.<br>Just close and open the application.');
+            },
+            error: function (error) {
+
+            },
+            complete: function () {
+
+            }
+        });
+
+    });
+
+    $('#li_hot_search').bind('click', function () {
+        $('.nav-menu').trigger('click');
+        back_to_home();
+        $('#random_people').css('display', 'none');
+        $('#li_rearch_result').css('display', 'none');
+        $('#phone_verification').css('display', 'none');
+        $('#li_synch_my_contacts').css('display', 'none');
+        $('#li_list_of_pre_words').css('display', 'none');
+        $('#profile_settings').css('display', 'none');
+        $('#near_by_locations').css('display', 'none');
+        $('#search_history').css('display', 'none');
+        $('#my_friend').css('display', 'none');
+        $('#hot_search_result').css('display', '');
+        fill_hot_search();
+    });
+
+    $('#li_search_history').bind('click', function () {
+        $('.nav-menu').trigger('click');
+        back_to_home();
+        $('#random_people').css('display', 'none');
+        $('#li_rearch_result').css('display', 'none');
+        $('#phone_verification').css('display', 'none');
+        $('#li_synch_my_contacts').css('display', 'none');
+        $('#li_list_of_pre_words').css('display', 'none');
+        $('#profile_settings').css('display', 'none');
+        $('#near_by_locations').css('display', 'none');
+        $('#hot_search_result').css('display', 'none');
+        $('#my_friend').css('display', 'none');
+
+        $('#search_history').css('display', '');
+
+        fill_search_hist();
+    });
+
+    $('#li_my_friend').bind('click', function () {
+        $('.nav-menu').trigger('click');
+        back_to_home();
+        $('#random_people').css('display', 'none');
+        $('#li_rearch_result').css('display', 'none');
+        $('#phone_verification').css('display', 'none');
+        $('#li_synch_my_contacts').css('display', 'none');
+        $('#li_list_of_pre_words').css('display', 'none');
+        $('#profile_settings').css('display', 'none');
+        $('#near_by_locations').css('display', 'none');
+        $('#hot_search_result').css('display', 'none');
+        $('#search_history').css('display', 'none');
+        $('#my_friend').css('display', '');
+        fill_my_friend();
+    });
+
     $('#btnadd_nick_name_button').bind('click', function () {
 
-        $('#add_nick_name_modal').closeModal();
+        $('#add_nick_name_modal').modal('hide');
         var option_c_code = $('option:selected', $('#defaultCountry')).attr('ccode');
 
         Ajax.call({
@@ -358,17 +503,24 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
                 email: $('#email').val(),
                 adr: $('#address').val(),
                 uid: $('#inptsrvuid').val(),
-                sel_cc: option_c_code.replace("+", "")
+                sel_cc: option_c_code.replace("+", ""),
+                fb_link: $('#fb_link').val(),
+                gp_link: $('#gp_link').val(),
+                tw_link: $('#tw_link').val(),
+                lk_link: $('#lk_link').val(),
+                sk_link: $('#sk_link').val(),
+                sk_youtube: $('#sk_youtube').val()
+
             },
             success: function (data) {
 
-                toast_it("Thank you, your new Nick Name has been added.");
+                AndroidFunction.toast_it("Thank you, your new Nick Name has been added.");
 
                 back_to_home();
             },
             error: function (error) {
 
-                toast_it("Failed to add a new nick name, please try again.");
+                AndroidFunction.toast_it("Failed to add a new nick name, please try again.");
 
             },
             complete: function () {
@@ -380,108 +532,129 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
     });
 
-    $('#btn_yes_edit_my_name').bind('click', function () {
-
-        if ($('#txt_edit_the_new_nick_name').val() == $('#txt_edit_the_new_old_nick_name').val()) {
-            var msg = '<div id="card-alert" class="card orange lighten-5"><div class="card-content orange-text"><p><i class="mdi-navigation-check"></i> Warning : No changes detected, try to change the listed name.</p></div></div>';
-            $('#popup_edit_a_name_process_message').html(msg).show().delay(1500).hide("fast", function () {
-                $('#popup_edit_a_name_process_message').html('');
-            });
-
-            return;
-        }
-        Ajax.call({
-            url: dealinguri + "/rc20/editacontact",
-            cache: false,
-            type: 'GET',
-            async: true,
-            data: {
-                cautocoding: $('#txt_edit_the_new_id').val(),
-                oldvalue: $('#txt_edit_the_new_old_nick_name').val(),
-                newvalue: $('#txt_edit_the_new_nick_name').val(),
-                curautocoding: $('#inptsrvuid').val(),
-                devuid: $('#txt_devuid').val(),
-                c_id: '41',
-                coord: $('#coord').val(),
-                platform: $('#txt_platform').val(),
-                AppName: $('#txt_app_name').val(),
-                forcdedec: 'y',
-                vers: $('#txt_version').val()
-            },
-            success: function (data) {
-                if (data == "done") {
-                    getpointscenter_quick();
-                    $('#' + $('#txt_edit_the_ltl_id').val()).html($('#txt_edit_the_new_nick_name').val());
-                    $('#' + $('#txt_edit_the_ahr_id').val()).attr('cust_name', $('#txt_edit_the_new_nick_name').val());
-
-                    var msg = '<div id="card-alert" class="card green"><div class="card-content white-text"><p><i class="mdi-navigation-check"></i> SUCCESS : The name has been changed to ' + $('#txt_edit_the_new_nick_name').val() + '.</p></div></div>';
-                    $('#popup_edit_a_name_process_message').html(msg).show().delay(1500).hide("fast", function () {
-                        $('#popup_edit_a_name_process_message').html('');
-                        $('#popup_edit_a_name').closeModal();
-                    });
-                }
-                else {
-                    var msg = '<div id="card-alert" class="card red"> <div class="card-content white-text"><p>ERROR : ' + data + '</p></div></div>';
-                    $('#popup_edit_a_name_process_message').html(msg).show().delay(1500).hide("fast", function () {
-                        $('#popup_edit_a_name_process_message').html('');
-                        $('#popup_edit_a_name').closeModal();
-                    });
-                }
-            },
-            error: function (error) {
-                var msg = '<div id="card-alert" class="card red"> <div class="card-content white-text"><p>ERROR :  Check your internet connection</p></div></div>';
-                $('#popup_edit_a_name_process_message').html(msg).show().delay(1500).hide("fast", function () {
-                    $('#popup_edit_a_name_process_message').html('');
-                    $('#popup_edit_a_name').closeModal();
-                });
-            },
-            complete: function () {
-
-            }
-        });
-
-
-
+    $('#btnsaveprofile').bind('click', function () {
+        submit_profile();
     });
-
 
     $('#btn_add_nick_name').bind('click', function (event) {
 
         $('#txt_new_nick_name').val('');
+        $('#add_nick_name_modal').modal('show');
+
+    });
+
+    $('#btn_activate_deactivate').bind('click', function (event) {
+
+        $('#activate_deactivate_modal').modal('show');
 
     });
 
     $('#places_result_back').bind('click', function (event) {
 
-        $('#Register').css('display', 'none');
-        $('#near_by_locations').css('display', '');
-        $('#places_result').css('display', 'none');
-        $('#search_result').css('display', 'none');
-        $('#places_result_effect').html('');
-        event.preventDefault();
-        event.stopPropagation();
-
-    });
-
-
-
-    $('#contacts_in_common_back').bind('click', function (event) {
-
-
-
-        $('#Register').css('display', 'none');
-        $('#near_by_locations').css('display', 'none');
-        $('#places_result').css('display', 'none');
-        $('#search_result').css('display', '');
-        $('#contacts_in_common').css('display', 'none');
-        $('#contacts_in_common_effect').html('');
-
+        back_to_home_places();
 
         event.stopPropagation();
         event.preventDefault();
 
     });
 
+    $('#btn_random_people_add_as_friend_submit_button').bind('click', function () {
+
+        $('#random_people_add_as_friend_modal').modal('hide');
+
+        Ajax.call({
+            url: dealinguri + "/social/add_me_as_new_friend_to_you",
+            cache: false,
+            type: 'GET',
+            async: true,
+            data: {
+                devuid: $('#txt_devuid').val(),
+                fullname: $('#txt_new_nick_name').val(),
+                pnbr: $('#phonenbr').val(),
+                email: $('#email').val(),
+                adr: $('#address').val(),
+                uid: $('#inptsrvuid').val(),
+                fb_link: $('#fb_link').val(),
+                gp_link: $('#gp_link').val(),
+                tw_link: $('#tw_link').val(),
+                lk_link: $('#lk_link').val(),
+                sk_link: $('#sk_link').val(),
+                sk_youtube: $('#sk_youtube').val(),
+                wh_user_id: $('#txt_id_of_friend_to_be_added').val()
+            },
+            success: function (data) {
+
+                if (data == 'success') {
+
+                    toastr.success('Congrats you\'ve added a new friend.');
+
+                }
+                //  AndroidFunction.toast_it("Thank you, your new Nick Name has been added.");
+
+                //back_to_home();
+            },
+            error: function (error) {
+
+                //AndroidFunction.toast_it("Failed to add a new nick name, please try again.");
+
+            },
+            complete: function () {
+
+            }
+        });
+
+
+
+    });
+    $('#btn_random_people_remove_as_friend_submit_button').bind('click', function () {
+
+        $('#random_people_remove_friend_modal').modal('hide');
+
+        Ajax.call({
+            url: dealinguri + "/social/remove_a_friend_to",
+            cache: false,
+            type: 'GET',
+            async: true,
+            data: {
+                devuid: $('#txt_devuid').val(),
+                fullname: $('#txt_new_nick_name').val(),
+                pnbr: $('#phonenbr').val(),
+                email: $('#email').val(),
+                adr: $('#address').val(),
+                uid: $('#inptsrvuid').val(),
+                fb_link: $('#fb_link').val(),
+                gp_link: $('#gp_link').val(),
+                tw_link: $('#tw_link').val(),
+                lk_link: $('#lk_link').val(),
+                sk_link: $('#sk_link').val(),
+                sk_youtube: $('#sk_youtube').val(),
+                wh_autocoding: $('#txt_id_of_friend_to_be_removed').val()
+            },
+            success: function (data) {
+
+                if (data == 'success') {
+
+                    toastr.success('Friend removed from your list.');
+                    fill_my_friend();
+
+                }
+                //  AndroidFunction.toast_it("Thank you, your new Nick Name has been added.");
+
+                //back_to_home();
+            },
+            error: function (error) {
+
+                //AndroidFunction.toast_it("Failed to add a new nick name, please try again.");
+
+            },
+            complete: function () {
+
+            }
+        });
+
+
+
+    });
 
     $('#search_result_back').bind('click', function (event) {
 
@@ -492,413 +665,108 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
     });
 
-
-    $('#btn_menu_remove_ads').bind('click', function (event) {
-
-        var cur_balance = eval($('#spnofrealbal').html());
-
-        if (cur_balance < 500) {
-            $('#no_enough_balance_modal').openModal();
-
-        }
-        else {
-            $('#remove_ads_from_app_modal').openModal();
-
-        }
-
-
-    });
-
-
-    $('#btn_menu_my_history').bind('click', function (event) {
-
-        get_my_search_history();
-
-    });
-
-    $('#btn_menu_my_views').bind('click', function (event) {
-
-        get_who_views_me();
-
-    });
-
-    $('#btn_menu_home').bind('click', function (event) {
-
-        $('#sidenav-overlay').trigger('click');
-        hide_all_layers();
-        show_a_layer("li_home_page");
-        myScroll.refresh();
-
-    });
-
-
-    $('#btn_menu_my_listing').bind('click', function (event) {
-
-        check_for_showing_my_listing();
-
-    });
-
-    $('#btn_menu_my_social_net').bind('click', function (event) {
-
-        try {
-            AndroidFunction.gettosocialnet("");
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-
-    });
-
-
-    $('#btn_no_enough_balance_modal_button').bind('click', function (event) {
-
-    });
-
-
-    $('#btn_phone_number__not_verified_Goto_verification_center').bind('click', function (event) {
-
-        if ($('#txt_sim_country_iso').val() == "") {
-            Ajax.call({
-                url: dealinguri + "/rc20/failedtogetisos",
-                cache: false,
-                type: 'GET',
-                async: true,
-                data: {
-                    devuid: $('#txt_devuid').val()
-                },
-                success: function (data) {
-                    $('#txt_sim_country_iso').val(data.toLowerCase());
-
-                    if ($("#txt_sim_country_iso").val() != "") {
-                        $('#cmbcountries').val($("#txt_sim_country_iso").val());
-                        $('#defaultCountry').val($("#txt_sim_country_iso").val());
-                        var option_c_flag = $('option:selected', $('#cmbcountries')).attr('flg');
-                        var option_c_code = $('option:selected', $('#cmbcountries')).attr('ccode');
-                        $('#imgcountryflag').attr('src', option_c_flag);
-                        $('#spn_selected_country_code').html(option_c_code);
-                        $('#txt_sim_country_iso_ccode').val(option_c_code);
-                        $('#txt_verification_ccode').val($('#txt_sim_country_iso_ccode').val().replace("+", ""));
-                    }
-                },
-                error: function (error) {
-
-                },
-                complete: function () {
-
-                }
-            });
-        }
-
-
-        $('#txt_verification_ccode').val($('#txt_sim_country_iso_ccode').val().replace("+", ""));
-        $('#phone_number__not_verified_modal').closeModal();
-        $('#phonenumberverifier').show('slideup');
-        event.stopPropagation();
-        event.preventDefault();
-
-    });
-
-    $('#btnclosephonenumberverifier').bind('touchend', function (event) {
-
-        $('#phonenumberverifier').hide('slidedown');
-        event.stopPropagation();
-        event.preventDefault();
-
-    });
-
-
-    $('#btn_get_more_coins_for_free').bind('touchend', function (event) {
-
-        $('#popup_get_free_coins').openModal();
-        event.stopPropagation();
-        event.preventDefault();
-    });
-
-    $('#btn_check_received_verification_code').bind('touchend', function (event) {
-
-        if ($('#txt_verification_phone_received_code').val() == "") {
-            $('#dv_send_verification_code_status').html("Error: Invalid entered Code.");
-            return;
-        }
-
-        if ($('#hdng_code').val() != $('#txt_verification_phone_received_code').val()) {
-
-            $('#dv_send_verification_code_status').html("Error: Invalid entered Code.");
-            return;
-        }
-        else {
-
-        }
-
-        event.stopPropagation();
-        event.preventDefault();
-    });
-
-
-
-
-    $('#btn_send_verification_code').bind('touchend', function (event) {
-
-
-        $('#dv_send_verification_code_status').html("Please Wait...");
-        var enteredphone = "";
-        enteredphone = $('#txt_verification_phone').val();
-        var isStartWithZero = enteredphone.indexOf("0") == 0;
-        if (isStartWithZero) {
-            enteredphone = enteredphone.substring(1);
-        }
-        var phonefullnumber = $('#txt_verification_ccode').val() + enteredphone;
-        if (enteredphone == "") {
-            $('#dv_send_verification_code_status').html("Please enter a valid phone number");
-            return;
-        }
-
-        try {
-            AndroidFunction.trigger_verification_process(phonefullnumber);
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-        event.stopPropagation();
-        event.preventDefault();
-    });
-
-
-
-    $('#btn_synch_my_contacts_confirmation_yes').bind('click', function (event) {
-        try {
-            AndroidFunction.ask_for_band_consuming("101");
-
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-
-        $('#popup_get_free_coins').closeModal();
-        $('#synch_my_contacts_confirmation_modal').closeModal();
-
-        event.stopPropagation();
-        event.preventDefault();
-    });
-
-
-    $('#btn_yes_clear_my_history').bind('click', function (event) {
-        clear_history_request();
-
-        event.stopPropagation();
-        event.preventDefault();
-    });
-
-    $('#btn_no_enough_balance_modal_Goto_coins_center').bind('click', function (event) {
-
-        $('#no_enough_balance_modal').closeModal();
-        $('#maincoinssystem').show('slideup');
-        event.stopPropagation();
-        event.preventDefault();
-
-    });
-
-
-
-    $('#btn_get_more_coins_free_cancel').bind('touchend', function (event) {
-
-        $('#popup_get_free_coins').closeModal();
-        event.stopPropagation();
-        event.preventDefault();
-    });
-
-    $('#btn_get_more_coins_free_vungle_vid').bind('click', function (event) {
-
-
-        $('#popup_get_free_coins').closeModal();
-
-        try {
-            AndroidFunction.display_adcolony_V4V_ad("");
-
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-
-        event.stopPropagation();
-
-        event.preventDefault();
-    });
-
-    $('#btn_nearby_pleaces').bind('touchend', function (event) {
-
-        $('#Register').css('display', 'none');
-        $('#near_by_locations').css('display', '');
-        $('#places_result').css('display', 'none');
-        $('#search_result').css('display', 'none');
-        $('#contacts_in_common').css('display', 'none');
-
-        $('#places_result_effect').html('');
-
-        event.stopPropagation();
-
-        event.preventDefault();
-    });
-
-
-
-    $('#header_logo').bind('touchend', function (event) {
+    $('#header_logo').bind('click', function (event) {
 
         back_to_home();
 
+        event.stopPropagation();
+        event.preventDefault();
+
+    });
+
+    $('#img_show_places').bind('touchend', function (event) {
+
+        back_to_home();
+        $('#random_people').css('display', 'none');
+        $('#li_rearch_result').css('display', 'none');
+        $('#phone_verification').css('display', 'none');
+        $('#li_synch_my_contacts').css('display', 'none');
+        $('#li_list_of_pre_words').css('display', 'none');
+        $('#profile_settings').css('display', 'none');
+        $('#hot_search_result').css('display', 'none');
+        $('#near_by_locations').css('display', '');
 
         event.stopPropagation();
         event.preventDefault();
 
-
     });
+    //$('#cmb_countries_firer').bind('click', function (event) {
 
-    $('#btn_share_conts').bind('touchend', function (event) {
+    //    $('#cmbcountries').toggle();
 
+    //    event.stopPropagation();
+    //    event.preventDefault();
 
-        confirm_contacts_synch();
-
-    });
-
-    $('#contacts_in_common_synch_contacts').bind('touchend', function (event) {
-
-        confirm_contacts_synch();
-
-    });
-
-
-
-    $("#container_of_flags").bind('touchend', function () {
-        // $('#cmbcountries').select2("open");
-        // $('.select2-drop-active').css('top', '87px');
-        // $('.select2-drop-active').css('width', '100%');
-        try {
-            AndroidFunction.open_country_selector("");
-
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-    });
-
+    //});
 
     $("#srch-term").keyup(function (event) {
         if (event.keyCode == 13) {
-            try {
-                AndroidFunction.hidethekeyboard("");
-            }
-            catch (ex) {
-                console.log(ex);
-            }
             searfor();
         }
-    }).focusout(function (e) {
-        try {
-            AndroidFunction.hidethekeyboard("");
+
+        if ($('#srch-term').val() == "") {
+            $('#btnsearch_loop').attr('class', 'ion-android-microphone');
         }
-        catch (ex) {
-            console.log(ex);
+        else {
+            $('#btnsearch_loop').attr('class', 'ion-search');
         }
-         searfor();
     });
 
-    $("#btnsearch").bind('touchend', function () {
-        searfor();
-    });
+    $("#btnsearch").bind('click', function () {
 
-    $("#btn_right_side_search_trigger").bind('touchend', function () {
-        searfor();
+        var searchterm = "";
+        searchterm = $('#srch-term').val();
+
+        if (searchterm == "") {
+            AndroidFunction.open_voice_commander();
+        }
+        else {
+            searfor();
+        }
+
     });
 
     $('#btnsettings').bind('touchend', function () {
-        // $('#dvSettings').popup('open');
-        window.showsettingsui("showsettingsui", function (echoValue) {
-        });
+
+        AndroidFunction.showsettingsui();
+
     });
 
-
-    $('#img_main_profile_rounded').bind('touchend', function () {
+    $('#img_main_profile_rounded').bind('click', function () {
         $('#li_rearch_result').css('display', 'none');
         $('#li_rearch_result').css('display', 'none');
         $('#phone_verification').css('display', 'none');
         $('#li_synch_my_contacts').css('display', 'none');
         $('#li_list_of_pre_words').css('display', 'none');
-
+        $('#random_people').css('display', 'none');
+        $('#hot_search_result').css('display', 'none');
         $('#profile_settings').css('display', '');
 
 
     });
+
     $('#btnverifymynumber').bind('touchend', function () {
         verifymyNumber();
     });
 
-    $('#btn_side_menu').bind('touchend', function () {
-        $('#Register').show('slideup');
+    $('#btn_open_camera').bind('click', function () {
+        AndroidFunction.opencamera();
     });
 
-    $('#btn_menu_settings').bind('touchend', function () {
-        try {
-            AndroidFunction.showsettingsui("");
-                   event.stopPropagation();
-                   event.preventDefault();
-        }
-        catch (ex) {
-            console.log(ex);
-        }
+    $('#btn_open_album').bind('click', function () {
+        AndroidFunction.openphotolibrary();
     });
 
-    $('#btn_get_more_coins').bind('touchend', function () {
-        /*$('#Register').css('display', 'none');
-         $('#near_by_locations').css('display', 'none');
-         $('#places_result').css('display', 'none');
-         $('#search_result').css('display', 'none');
-         $('#places_result_effect').html('');*/
-        $('#maincoinssystem').show('slideup');
+    $('#btn_side_menu_').bind('touchend', function () {
+
+        AndroidFunction.open_voice_commander();
 
     });
-
-    $('#btnclosesexoopointscenter').bind('touchend', function () {
-
-        $('#maincoinssystem').hide('slidedown');
-
-        event.stopPropagation();
-        event.preventDefault();
-
-    });
-
-    $('#btnclosemyprofile').bind('touchend', function () {
-
-
-        hide_all_layers();
-        show_a_layer("li_home_page");
-
-
-        event.stopPropagation();
-        event.preventDefault();
-
-    });
-
-
-
-    $('#btn_get_more_coins_in_app_1').bind('touchend', function () {
-
-        try {
-            AndroidFunction.triggertheinapp500coins("");
-        }
-        catch (ex) {
-            console.log(ex);
-        }
-
-    });
-
-
-
-
-
 
     $('#btn_submit_profile_fields').bind('touchend', function () {
         sendmybasicinfo();
     });
+
     $('#btn_close_profile_fields').bind('touchend', function () {
         $('#li_rearch_result').css('display', '');
         $('#phone_verification').css('display', 'none');
@@ -908,6 +776,7 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
 
     });
+
     $('#btn_skip_verification').bind('touchend', function () {
         $('#li_rearch_result').css('display', '');
         $('#phone_verification').css('display', 'none');
@@ -915,6 +784,7 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
 
     });
+
     $('#btn_synch_my_contacts').bind('touchend', function () {
         $('#li_rearch_result').css('display', 'none');
         $('#phone_verification').css('display', 'none');
@@ -924,6 +794,7 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
 
     });
+
     $('#btncancelsynchmycontacts').bind('touchend', function () {
         $('#li_rearch_result').css('display', '');
         $('#phone_verification').css('display', 'none');
@@ -933,15 +804,16 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
 
     });
+
     $('#btnyessynchmycontacts').bind('touchend', function () {
         var contype = $("#netwState").val();
         if ((contype == "Cell 2G connection") || (contype == "Cell 3G connection") || (contype == "Cell 4G connection")) {
             navigator.notification.confirm(
-                                           'Downloading / Uploading without Wifi will consume your 2G/3G/4G bandwidth.',  // message
-                                           onsynkConfirm,              // callback to invoke with index of button pressed
-                                           'Arab Caller',            // title
-                                           'Continue,Cancel'          // buttonLabels
-                                           );
+            'Downloading / Uploading without Wifi will consume your 2G/3G/4G bandwidth.',  // message
+            onsynkConfirm,              // callback to invoke with index of button pressed
+            'Real Call',            // title
+            'Continue,Cancel'          // buttonLabels
+            );
         }
         else {
             getdvinf();
@@ -985,147 +857,18 @@ $('#btn_synch_contacts_handler').bind('click', function (event) {
 
     });
 
-    $('.places_area').bind('touchend', function () {
+    $('.places_area').bind('click', function () {
         var tps = $(this).attr('tps');
         var myid = $(this).attr('id');
-
         get_places_details(tps, myid);
-
     });
-
 
 });
-
-
-function set_error_while_sending_sms() {
-    $('#phonenbr').html("Error while sending sms code.");
-}
-
-function set_confirmaton_sending_sms(phonefullnumber) {
-    $('#dv_send_verification_code_status').html("an sms sent to the number " + phonefullnumber + ", please wait.");
-}
-
-
-function set_verification_code(vc) {
-    $('#txt_verification_sms_body').val(vc);
-}
-
-
-function clear_history_request() {
-    Ajax.call({
-        url: dealinguri + "/rc20/cmh",
-        cache: false,
-        type: 'GET',
-        async: true,
-        data: {
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_version').val(),
-            machname: $('#txt_name').val(),
-            AppName: $("#txt_app_name").val(),
-            platform: $("#txt_platform").val(),
-            fullphone: $('#phonenbr').val(),
-            AutoCoding: $('#inptsrvuid').val(),
-            selccode: $('#txt_verification_ccode').val(),
-            selphone: $('#txt_verification_phone').val(),
-            vfsmvdy: $('#txt_verification_sms_body').val()
-        },
-        success: function (data) {
-            get_my_search_history();
-        },
-        error: function (error) {
-
-        },
-        complete: function () {
-
-        }
-    });
-
-}
-
-function verification_done(phonenbr) {
-
-    $('#phonenbr').val(phonenbr.replace("+", ""));
-
-    $('#phonenumberverifier').hide('slidedown');
-    if ($('#txt_verification_reason').val() == "contactsincommon") {
-        $('#generic_modal_text').html('Thank you for verifying your phone number.');
-        $('#generic_modal').openModal();
-        get_contacts_in_commons();
-    }
-
-    if ($('#txt_verification_reason').val() == "editaname") {
-        $('#generic_modal_text').html('Thank you for verifying your phone number.');
-        $('#generic_modal').openModal();
-        check_for_editing();
-    }
-          if($('#txt_verification_reason').val()=="pro")
-            {
-                $('#mainsubscriptionsystem').show('slideup');
-            }
-
-    $('#txt_verification_reason').val("");
-
-    Ajax.call({
-        url: dealinguri + "/rc20/setmyverifiednum",
-        cache: false,
-        type: 'GET',
-        dataType: 'json',
-        async: true,
-        data: {
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_version').val(),
-            machname: $('#txt_name').val(),
-            AppName: $("#txt_app_name").val(),
-            platform: $("#txt_platform").val(),
-            fullphone: $('#phonenbr').val(),
-            AutoCoding: $('#inptsrvuid').val(),
-            selccode: $('#txt_verification_ccode').val(),
-            selphone: $('#txt_verification_phone').val(),
-            vfsmvdy: $('#txt_verification_sms_body').val()
-        },
-        success: function (data) {
-            if (data != "") {
-                $.each(data.t, function (index, item) {
-                    if (item.cid != "") {
-
-                        $('#fullname').val(item.Name);
-                        $('#phonenbr').val(item.Phone);
-                        $('#email').val(item.email);
-                        $('#address').val(item.faddress);
-                        $('#inptsrvuid').val(item.cid);
-
-                        if (item.CountryCode != "") {
-                            $('#defaultCountry').val(item.CountryCode);
-                        }
-                        send_to_native();
-                    }
-                });
-                $('#dv_dynamic_server_garb').html(data.fordynamonlyjs);
-            }
-        },
-        error: function (error) {
-
-        },
-        complete: function () {
-
-        }
-    });
-
-}
-
-function confirm_contacts_synch() {
-    $('#popup_get_free_coins').closeModal();
-
-    $('#synch_my_contacts_confirmation_modal').openModal();
-
-
-}
-
 
 function check_for_my_identity_on_the_server() {
 
     Ajax.call({
-        url: dealinguri + "/rc20/check_for_my_identity",
+        url: dealinguri + "/identifiereng/check_for_my_identity",
         cache: false,
         type: 'GET',
         dataType: 'json',
@@ -1141,23 +884,28 @@ function check_for_my_identity_on_the_server() {
             if (data != "") {
                 $.each(data.t, function (index, item) {
                     if (item.cid != "") {
+                        $('#inptsrvuid').val(item.cid);
                         $('#fullname').val(item.Name);
                         $('#phonenbr').val(item.Phone);
                         $('#email').val(item.email);
                         $('#address').val(item.faddress);
-                        $('#inptsrvuid').val(item.cid);
-                        if (item.CountryCode != "") {
-                            $('#defaultCountry').val(item.CountryCode);
+
+                        if (item.CountryCode != null) {
+                            if (item.CountryCode != "") {
+                                $("#defaultCountry").val(item.CountryCode);
+                            }
                         }
-                        $('#spnofname_f_chars_left').html(item.name_first_char);
+
+                        $("#fb_link").val(item.facebook);
+                        $("#gp_link").val(item.gplus);
+                        $("#tw_link").val(item.twitter);
+                        $("#lk_link").val(item.linkedin);
+                        $("#sk_link").val(item.skype);
+                        $("#sk_youtube").val(item.youtube);
+
+
+
                         send_to_native();
-
-                     $('#txt_user_level').val(item.u_level);
-
-                     if($('#txt_user_level').val()=="pro")
-                     {
-                        $("#img_pro_sign").css('display','');
-                     }
                     }
                 });
                 $('#dv_dynamic_server_garb').html(data.fordynamonlyjs);
@@ -1172,12 +920,8 @@ function check_for_my_identity_on_the_server() {
     });
 }
 
-
-
-
-
 function get_places_details(tps, myid) {
-
+    $('#random_people').css('display', 'none');
     $('#li_places_result').html('');
     $('#places_result_back').css('display', 'none');
 
@@ -1186,6 +930,8 @@ function get_places_details(tps, myid) {
     $('#places_result').css('display', '');
 
     $('#search_result').css('display', 'none');
+    $('#my_friend_profile').css('display', 'none');
+
     $('#places_result_effect').html('Please wait...');
 
     var searchterm = "";
@@ -1201,48 +947,14 @@ function get_places_details(tps, myid) {
     $('#li_list_of_pre_words').css('display', 'none');
 
 
-    var area_cls_name = "panel-default";
-    if (myid == "l_p_1") {
-        area_cls_name = "panel-green";
-    }
-    if (myid == "l_p_2") {
-        area_cls_name = "panel-red";
-    }
-    if (myid == "l_p_3") {
-        area_cls_name = "panel-yellow";
-    }
-    if (myid == "l_p_4") {
-        area_cls_name = "panel-blue";
-    }
-    if (myid == "l_p_5") {
-        area_cls_name = "panel-dam_khanzir";
-    }
-    if (myid == "l_p_6") {
-        area_cls_name = "panel-pustashe";
-    }
-    if (myid == "l_p_7") {
-        area_cls_name = "panel-grey";
-    }
-    if (myid == "l_p_8") {
-        area_cls_name = "panel-red";
-    }
-    if (myid == "l_p_9") {
-        area_cls_name = "panel-green";
-    }
-    if (myid == "l_p_10") {
-        area_cls_name = "panel-yellow";
-    }
-    if (myid == "l_p_11") {
-        area_cls_name = "panel-grey";
-    }
-    if (myid == "l_p_12") {
-        area_cls_name = "panel-dam_khanzir";
-    }
+    var selected_cat = $($('#' + myid).find('.pull-left')).html();
+
+    $('#sub_places_result_effect').html("<b>\"" + selected_cat + "\"</b> Search Result..");
 
 
     show_loading();
     Ajax.call({
-        url: dealinguri + "/geolocations/places",
+        url: dealinguri + "/geolocations/places_new",
         cache: true,
         type: 'GET',
         async: true,
@@ -1269,8 +981,6 @@ function get_places_details(tps, myid) {
                 $('#li_places_result').html(data);
 
             }
-            $('#places_result_l_1').removeAttr('class');
-            $('#places_result_l_1').attr('class', area_cls_name);
 
             $('#places_result_effect').html('');
             hide_loading();
@@ -1279,9 +989,6 @@ function get_places_details(tps, myid) {
             $('#places_result_back').css('display', '');
             $('#places_result_effect').html('');
             hide_loading();
-            $('#places_result_l_1').removeAttr('class');
-            $('#places_result_l_1').attr('class', area_cls_name);
-
 
         },
         complete: function () {
@@ -1290,11 +997,6 @@ function get_places_details(tps, myid) {
     });
 
 }
-
-
-
-
-
 
 function onsynkConfirm(button) {
     if (button == "1") {
@@ -1306,14 +1008,16 @@ function onsynkConfirm(button) {
 }
 
 function show_loading() {
-    $('#waiter').html('<span>Processing... <span> <img src="images/browny_load.gif" style="width:24px;"/>');
-    //.html('<img src="img/flyingdots.gif"/>');
+    $('#loading_bar').css('display', '');
+    $('#dvloading').html('<img src="img/flyingdots.gif"/>');
 }
 
 function hide_loading() {
-    $('#waiter').html('');
+    $('#loading_bar').css('display', 'none');
+    $('#btnsearch_loop').css('display', '');
+    $('#btnsearch_loading').css('display', 'none');
+    $('#dvloading').html('');
 }
-
 function ask_yamli() {
     var searchterm = "";
     searchterm = $('#srch-term').val();
@@ -1350,14 +1054,7 @@ function ask_yamli() {
 
                 }
                 if (markup != "") {
-                    $('#li_rearch_result').css('display', 'none');
-                    $('#phone_verification').css('display', 'none');
-                    $('#profile_settings').css('display', 'none');
-                    $('#li_synch_my_contacts').css('display', 'none');
-                    $('#li_list_of_pre_words').css('display', '');
-
-                    $('#Autocomplete_1333719222268').html(markup);
-
+                    $('#li_rearch_result').html(markup);
 
                     $('.clscustforsear').bind('click', function () {
                         $('#srch-term').val($(this).attr('custtext'));
@@ -1368,7 +1065,7 @@ function ask_yamli() {
                 }
             }
             else {
-                 alert("error");
+                // alert("error");
             }
         },
         error: function (error) {
@@ -1380,39 +1077,58 @@ function ask_yamli() {
     });
 
 }
-
-function setandsearch(sourceelem) {
-    $('#srch-term').val($(sourceelem).attr('hrefo'));
-    searfor();
-}
-
 function searfor() {
-  //  AndroidFunction.get_admob_native_ad();
 
     var searchterm = "";
     searchterm = $('#srch-term').val();
 
-    if (searchterm == "") {
-        return;
-    }
 
-    hide_all_layers();
-    $('#li_list_of_pre_words').css('display', 'none');
-    $('#sidenav-overlay').trigger('click');
-    show_loading();
 
+
+
+
+    //if (searchterm == "") {
+
+    //    toastr.error('Enter something so we can search for it.', 'Something missing', { positionClass: 'toast-top-left' });
+
+
+    //    return;
+    //}
+
+    $('#random_people').css('display', 'none');
+    $('#hot_search_result').css('display', 'none');
+
+    $('#Register').css('display', 'none');
+    $('#near_by_locations').css('display', 'none');
+    $('#places_result').css('display', 'none');
+
+    $('#search_result').css('display', '');
+    $('#my_friend_profile').css('display', 'none');
+
+    $('#result_effect').html('Please wait...');
+    $('#search_result_back').css('display', 'none');
     var option_c_code = $('option:selected', $('#cmbcountries')).attr('ccode');
 
     if (option_c_code == null) {
-        option_c_code = "All";
+        option_c_code = "ALL";
     }
 
 
+    $('#li_rearch_result').css('display', '');
+    $('#profile_settings').css('display', 'none');
+    $('#li_list_of_pre_words').css('display', 'none');
+
+
+    $('#result_effect').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
+    $('#sub_result_effect').html("\"" + $('#srch-term').val() + "\" جاري البحث");
+
     show_loading();
+
     Ajax.call({
-        url: dealinguri + "/rc20/n_sonplus",
-        cache: false,
+        url: dealinguri + "/search/s",
+        cache: true,
         type: 'GET',
+        dataType: 'json',
         async: true,
         data: {
             nid: searchterm,
@@ -1427,27 +1143,302 @@ function searfor() {
             fcntry: option_c_code,
             lang: $('#txt_local_language').val(),
             lat: $('#txt_lat').val(),
-            lng: $("#txt_lng").val()
+            lng: $("#txt_lng").val(),
+            natlnd: $('#txt_locate_number_directive').val()
+
         },
         success: function (data) {
             if (data != "") {
 
-                hide_loading();
-                $('#dv_search_center_content').html(data);
-                show_a_layer('li_search_page');
-                myScroll.refresh();
-            }
+                var markup = "<ul id=\"lstresultview\" data-theme=\"a\"  style='width:100%;list-style-type: none;padding-left: 1px;'>";
 
+                if (data.t.length == 0) {
+                    $('#result_effect_img').addClass('fa-frown-o');
+                    $('#result_effect').html("");
+                    $('#li_rearch_result').html('<div >لا توجد نتائج .....</div>');
+                    // ask_yamli();
+                }
+                else {
+                    $('#result_effect_img').removeClass('fa-frown-o');
+                    $('#result_effect_img').addClass('fa-smile-o');
+                    $('#result_effect').html('');
+
+
+
+                    $.each(data.t, function (index, item) {
+
+                        var tempresult = $('#result-template').html();
+                        var full_phone_number = "+" + item.CountryCode + item.Phone;
+                        tempresult = tempresult.replace('**name**', item.Name);
+                        tempresult = tempresult.replace('**edit_name**', item.Name);
+                        tempresult = tempresult.replace('**custname**', item.Name);
+                        tempresult = tempresult.replace('**tel**', full_phone_number);
+                        tempresult = tempresult.replace('**custtel**', full_phone_number);
+                        tempresult = tempresult.replace('**fullphonenumber**', full_phone_number);
+
+                        tempresult = tempresult.replace('**curlevel**', item.curlevel);
+
+                        tempresult = tempresult.replace('**telvi**', full_phone_number);
+                        tempresult = tempresult.replace('**flg**', item.Country);
+                        tempresult = tempresult.replace('**lastseen**', item.lastseen);
+                        tempresult = tempresult.replace('**sharephonenumber_and_name_share**', item.Name + " " + full_phone_number);
+                        tempresult = tempresult.replace('**sharephonenumber_and_name**', item.Name + " " + full_phone_number);
+
+
+                        if (item.avatar != "") {
+                            if (item.avatar.startsWith('http')) {
+                                tempresult = tempresult.replace('**pic**', item.avatar);
+                            }
+                            else {
+                                tempresult = tempresult.replace('**pic**', data.rcpicpath + item.avatar);
+                            }
+                        }
+                        else {
+                            var person_gender = "";
+                            if (item.Gender == "") {
+                                person_gender = "img/gnome_stock_person.png";
+                            }
+                            if (item.Gender == "M") {
+                                person_gender = "img/gnome_stock_personmale.png";
+                            }
+                            if (item.Gender == "F") {
+                                person_gender = "img/gnome_stock_personfame.png";
+                            }
+
+                            tempresult = tempresult.replace('**pic**', person_gender);
+                        }
+                        tempresult = tempresult.replace('**uresid**', "q_res_" + item.ID);
+
+                        tempresult = tempresult.replace('**moreinfo**', item.parag_info);
+
+                        tempresult = tempresult.replace('**plusoneuid**', item.ID);
+                        tempresult = tempresult.replace('**minusoneuid**', item.ID);
+                        tempresult = tempresult.replace('**shareuid**', item.ID);
+                        tempresult = tempresult.replace('**reportuid**', item.ID);
+
+
+                        tempresult = tempresult.replace('**pval**', item.plus_minus.plus);
+                        tempresult = tempresult.replace('**mval**', item.plus_minus.minus);
+
+                        tempresult = tempresult.replace('**pmedid**', item.plus_minus.plus_me_did);
+                        tempresult = tempresult.replace('**mmedid**', item.plus_minus.minus_me_did);
+
+                        markup += "<li class='li_result_item' custid='" + item.ID + "'>" + tempresult + "</li>";
+
+                    });
+
+                    markup += "</ul>";
+                    $('#li_rearch_result').html(markup);
+
+
+                    var load_more_markup = '<li class="load-more"  style="height:80px;width:100%;"  data-icon="refresh"><table align="center" style="width:100%;"><tr><td style="vertical-align:middle"><img src="img/interact.png" style="width:48px;float:right;" /></td><td style="vertical-align:middle"><span style="color:#669900;"> المزيد ...</span></td><td style="vertical-align:middle"><div id="dvloadmorewait"></div></td></tr></table></li>';
+
+                    $('#pnl_result_footer_load_more').html(load_more_markup);
+
+                    $loadMore = $('#pnl_result_footer_load_more').children('.load-more');
+                    $loadMore.bind('touchstart', function () {
+                        loadmoreResult();
+                    });
+
+                    manageloadedIDs();
+                    link_ppl_images();
+
+                    $('.btnplusone').each(function (index) {
+                        var plus_val = $(this).attr('plus_val');
+                        var plus_me_did = $(this).attr('plus_me_did');
+
+                        if (plus_val != null) {
+                            if (plus_val != '**pval**') {
+                                if (eval(plus_val) > 0) {
+                                    $(this).val('+' + plus_val);
+                                }
+                            }
+                        }
+                        if (plus_me_did == 'y') {
+                            $(this).css('background-color', 'rgb(146, 239, 42)');
+                            $(this).css('color', '#000');
+                        }
+
+                    });
+                    $('.btnminusone').each(function (index) {
+                        var minus_val = $(this).attr('minus_val');
+                        var minus_me_did = $(this).attr('minus_me_did');
+
+                        if (minus_val != null) {
+                            if (minus_val != '**mval**') {
+                                if (eval(minus_val) > 0) {
+                                    $(this).val('-' + minus_val);
+                                }
+                            }
+                        }
+                        if (minus_me_did == 'y') {
+                            $(this).css('background-color', '#ff0404');
+                            $(this).css('color', '#FFF');
+                        }
+                    });
+
+                    $('.btnplusone').unbind('click');
+                    $('.btnplusone').bind('click', function () {
+
+                        var dest_user_id = $(this).attr('related_user_id');
+                        var btn_clicked_button = $(this);
+
+                        Ajax.call({
+                            url: dealinguri + "/raterengine/addoneto",
+                            cache: false,
+                            type: 'GET',
+                            async: true,
+                            data: {
+                                devuid: $('#txt_devuid').val(),
+                                platform: $("#txt_platform").val(),
+                                vers: $('#txt_version').val(),
+                                dvuniqueuserid: $('#inptsrvuid').val(),
+                                dest_user_id: dest_user_id
+                            },
+                            success: function (data) {
+                                //$('#dv_contacts_synch_progress').html(data);
+                                var plus_val = data;
+                                if (plus_val != null) {
+                                    if (plus_val != '**pval**') {
+                                        if (eval(plus_val) > 0) {
+                                            $(btn_clicked_button).css('background-color', 'rgb(146, 239, 42)');
+                                            $(btn_clicked_button).css('color', '#000');
+                                            $(btn_clicked_button).val('+' + data);
+                                        }
+                                        else {
+                                            $(btn_clicked_button).css('background-color', '#FFF');
+                                            $(btn_clicked_button).css('color', '#666666');
+                                            $(btn_clicked_button).val('+1');
+                                        }
+                                    }
+                                }
+
+                            },
+                            error: function (error) {
+                            },
+                            complete: function () {
+
+                            }
+                        });
+
+
+                    });
+
+                    $('.btnminusone').unbind('click');
+                    $('.btnminusone').bind('click', function () {
+                        var dest_user_id = $(this).attr('related_user_id');
+                        var btn_clicked_button = $(this);
+
+                        Ajax.call({
+                            url: dealinguri + "/raterengine/minusonefrom",
+                            cache: false,
+                            type: 'GET',
+                            async: true,
+                            data: {
+                                devuid: $('#txt_devuid').val(),
+                                platform: $("#txt_platform").val(),
+                                vers: $('#txt_version').val(),
+                                dvuniqueuserid: $('#inptsrvuid').val(),
+                                dest_user_id: dest_user_id
+                            },
+                            success: function (data) {
+                                //$('#dv_contacts_synch_progress').html(data);
+                                var minus_val = data;
+                                if (minus_val != null) {
+                                    if (minus_val != '**mval**') {
+                                        if (eval(minus_val) > 0) {
+                                            $(btn_clicked_button).css('background-color', '#ff0404');
+                                            $(btn_clicked_button).css('color', '#FFF');
+                                            $(btn_clicked_button).val('-' + data);
+                                        }
+                                        else {
+                                            $(btn_clicked_button).css('background-color', '#FFF');
+                                            $(btn_clicked_button).css('color', '#666666');
+                                            $(btn_clicked_button).val('-1');
+                                        }
+                                    }
+                                }
+                            },
+                            error: function (error) {
+                            },
+                            complete: function () {
+
+                            }
+                        });
+
+                    });
+
+
+                    $('.btnreport').unbind('click');
+                    $('.btnreport').bind('click', function () {
+
+                        var dest_user_id = $(this).attr('related_user_id');
+                        $('#report_a_number_modal_wanted_id').val(dest_user_id);
+
+                        var btn_clicked_button = $(this);
+                    });
+
+
+
+                    $('.btnedit').unbind('click');
+                    $('.btnedit').bind('click', function () {
+
+                        $('#edit_a_number_modal_wanted_phone').val($(this).attr('related_user_phone'));
+                        $('#edit_a_number_modal_wanted_id').val($(this).attr('related_user_id'));
+                        $('#edit_a_number_modal_cur_level').val($(this).attr('curlevel'));
+                        $('#txt_edit_nick_name').val($(this).attr('related_user_name'));
+                        $('#txt_current_name_tobe_changed').html($(this).attr('related_user_name'));
+
+                        if (eval($("#hdncurbln").val()) > 0) {
+
+                            if ($('#phonenbr').val() == "") {
+
+                                toastr.info('It seems that you don\'t have a valid profile, please go to your profile and enter your current phone number.');
+                                $('.nav-user').trigger('click');
+
+                            }
+                            else {
+
+
+                                if ($('#edit_a_number_modal_wanted_phone').val().replace("+", "").replace(" ", "") == $('#phonenbr').val().replace("+", "").replace(" ", "")) {
+
+                                    $('#edit_a_number_modal').modal('show');
+
+
+                                }
+                                else {
+                                    toastr.info('It seems that you\'re changing a name that is not related to your entered phone number.');
+                                }
+                            }
+                        }
+                        else {
+                            $('#coins_center_main_layer').modal('show');
+                        }
+                    });
+
+
+
+
+
+
+                    $('.btnshareacontact').unbind('touchend');
+                    $('.btnshareacontact').bind('touchend', function () {
+                        var ctext = $(this).attr('related_user_phone_share') + " " + $('#outAppShareText').val();
+                        AndroidFunction.share(ctext, 'Pro Caller');
+                    });
+                    $('#dv_dynamic_server_garb').html(data.fordynamonlyjs);
+
+                }
+
+            }
+            $('#search_result_back').css('display', '');
 
             hide_loading();
-
         },
         error: function (error) {
             hide_loading();
-            $('#dv_search_center_content').html("<div class='innerscroller_error'>Sorry: cannot process your request now, try again.</div>");
-            show_a_layer('li_search_page');
-            myScroll.refresh();
-
+            $('#search_result_back').css('display', '');
+            $('#waiter').html("<div class='innerscroller_error'>Connection Error</div>");
         },
         complete: function () {
 
@@ -1456,11 +1447,9 @@ function searfor() {
 
 }
 
-
-
 function loadmoreResult() {
 
-    // $('#txt_secret_load_more').val(eval($('#txt_secret_load_more').val()) + 1);
+  //  AndroidFunction.display_admob_interstitial("");
 
     var searchterm = "";
     searchterm = $('#srch-term').val();
@@ -1472,11 +1461,15 @@ function loadmoreResult() {
 
     $('#dvloadmorewait').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
 
+    $('#li_rearch_result').css('display', '');
+    $('#profile_settings').css('display', 'none');
+    $('#li_list_of_pre_words').css('display', 'none');
 
     Ajax.call({
-        url: dealinguri + "/rc20/n_sonplus",
-        cache: false,
+        url: dealinguri + "/search/s",
+        cache: true,
         type: 'GET',
+        dataType: 'json',
         async: true,
         data: {
             nid: searchterm,
@@ -1492,106 +1485,297 @@ function loadmoreResult() {
             fcntry: option_c_code,
             lang: $('#txt_local_language').val(),
             lat: $('#txt_lat').val(),
-            lng: $("#txt_lng").val()
-        },
-        success: function (data) {
-
-            if (data != "") {
-
-                $('#dv_search_center_content').append(data);
-                myScroll.refresh();
-            }
-
-        },
-        error: function (error) {
-            hide_loading();
-            $('#dv_search_center_content').append("<div class='innerscroller_error'>Sorry: cannot process your request now, try again.</div>");
-            myScroll.refresh();
-        },
-        complete: function () {
-
-        }
-    });
-
-}
-
-
-function get_who_views_me() {
-
-
-    $('#sidenav-overlay').trigger('click');
-
-    if (($('#txt_devuid').val() != "") && ($('#inptsrvuid').val() == "")) {
-        check_for_my_identity_on_the_server();
-    }
-
-    if ($('#phonenbr').val() == "") {
-        $('#txt_verification_reason').val("mylisting");
-
-        $('#phone_number__not_verified_modal').openModal();
-        return;
-    }
-
-
-
-
-    var searchterm = "";
-    searchterm = $('#srch-term').val();
-
-    if (searchterm == "") {
-        //   return;
-    }
-
-    hide_all_layers();
-    $('#li_list_of_pre_words').css('display', 'none');
-    $('#sidenav-overlay').trigger('click');
-    show_loading();
-
-
-    var option_c_code = $('option:selected', $('#cmbcountries')).attr('ccode');
-
-    if (option_c_code == null) {
-        option_c_code = "ALL";
-    }
-
-
-
-    Ajax.call({
-        url: dealinguri + "/rc20/n_getmyviews",
-        cache: false,
-        type: 'GET',
-        async: true,
-        data: {
-            nid: searchterm,
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_version').val(),
-            machname: $('#txt_name').val(),
-            AppName: $('#txt_app_name').val(),
-            dvuniqueuserid: $('#inptsrvuid').val(),
-            platform: $("#txt_platform").val(),
-            searchsourceofnative: $('#searchsourceofnative').val(),
-            forcdedec: 'y',
-            fcntry: option_c_code,
-            my_phone: $("#phonenbr").val(),
-            lang: $('#txt_local_language').val(),
-            lat: $('#txt_lat').val(),
             lng: $("#txt_lng").val(),
-            top: '20'
+            natlnd: $('#txt_locate_number_directive').val()
         },
         success: function (data) {
-            if (data != "") {
-                hide_loading();
-                $('#dv_views_center_content').html(data);
-                show_a_layer('li_views_page');
-                myScroll.refresh();
+            $('#dvloadmorewait').html('');
+
+            var out = [];
+            var dataCount = 0;
+            $.each(data.t, function (index, item) {
+                dataCount++;
+            });
+            if ((dataCount == 0) || (data.t == "")) {
+                //out.push('<li data-theme="a" style="text-align: center;margin: 5px;background-color: #FFF;padding: 5px;" ></li>');
+                //$('#lstresultview').append(out.join('')).append($loadMore);
+
+                //window.displayInterestitial("AdMob-Interstitial-FullScreen", function (echoValue) {
+                //});
             }
+            else {
+                //out.push('<li data-role="list-divider" data-theme="a" style="text-align: center;margin: 5px;background-color: #FFF;padding: 5px;">New Loaded Result (' + dataCount + ')</li>');
+                $.each(data.t, function (index, item) {
+                    var markup = "";
+
+                    var tempresult = $('#result-template').html();
+                    var full_phone_number = "+" + item.CountryCode + item.Phone;
+                    tempresult = tempresult.replace('**name**', item.Name);
+                    tempresult = tempresult.replace('**edit_name**', item.Name);
+                    tempresult = tempresult.replace('**custname**', item.Name);
+                    tempresult = tempresult.replace('**tel**', full_phone_number);
+                    tempresult = tempresult.replace('**custtel**', full_phone_number);
+                    tempresult = tempresult.replace('**curlevel**', item.curlevel);
+                    tempresult = tempresult.replace('**fullphonenumber**', full_phone_number);
+
+                    tempresult = tempresult.replace('**telvi**', full_phone_number);
+                    tempresult = tempresult.replace('**flg**', item.Country);
+                    tempresult = tempresult.replace('**lastseen**', item.lastseen);
+                    tempresult = tempresult.replace('**sharephonenumber_and_name_share**', item.Name + " " + full_phone_number);
+                    tempresult = tempresult.replace('**sharephonenumber_and_name**', item.Name + " " + full_phone_number);
+
+
+                    if (item.avatar != "") {
+                        if (item.avatar.startsWith('http')) {
+                            tempresult = tempresult.replace('**pic**', item.avatar);
+                        }
+                        else {
+                            tempresult = tempresult.replace('**pic**', data.rcpicpath + item.avatar);
+                        }
+                    }
+                    else {
+                        var person_gender = "";
+                        if (item.Gender == "") {
+                            person_gender = "img/gnome_stock_person.png";
+                        }
+                        if (item.Gender == "M") {
+                            person_gender = "img/gnome_stock_personmale.png";
+                        }
+                        if (item.Gender == "F") {
+                            person_gender = "img/gnome_stock_personfame.png";
+                        }
+
+                        tempresult = tempresult.replace('**pic**', person_gender);
+                    }
+                    tempresult = tempresult.replace('**uresid**', "q_res_" + item.ID);
+
+                    tempresult = tempresult.replace('**moreinfo**', item.parag_info);
+
+                    tempresult = tempresult.replace('**plusoneuid**', item.ID);
+                    tempresult = tempresult.replace('**minusoneuid**', item.ID);
+                    tempresult = tempresult.replace('**shareuid**', item.ID);
+                    tempresult = tempresult.replace('**reportuid**', item.ID);
+
+
+                    tempresult = tempresult.replace('**pval**', item.plus_minus.plus);
+                    tempresult = tempresult.replace('**mval**', item.plus_minus.minus);
+
+                    tempresult = tempresult.replace('**pmedid**', item.plus_minus.plus_me_did);
+                    tempresult = tempresult.replace('**mmedid**', item.plus_minus.minus_me_did);
+
+
+                    markup += "<li class='li_result_item' custid='" + item.ID + "'>" + tempresult + "</li>";
+                    out.push(markup);
+
+                });
+
+                $('#lstresultview').append(out.join(''));
+
+                if (data.t.length == 0) {
+                    // markup = "<div style='font-size:16pt;margin-top:15px;text-shadow:none;color:#006600'>Nothing Found.</div>";
+                }
+
+                manageloadedIDs();
+
+                link_ppl_images();
+
+                $('.btnplusone').each(function (index) {
+                    var plus_val = $(this).attr('plus_val');
+                    var plus_me_did = $(this).attr('plus_me_did');
+
+                    if (plus_val != null) {
+                        if (plus_val != '**pval**') {
+                            if (eval(plus_val) > 0) {
+                                $(this).val('+' + plus_val);
+                            }
+                        }
+                    }
+                    if (plus_me_did == 'y') {
+                        $(this).css('background-color', 'rgb(146, 239, 42)');
+                        $(this).css('color', '#000');
+                    }
+
+                });
+
+
+
+                $('.btnminusone').each(function (index) {
+                    var minus_val = $(this).attr('minus_val');
+                    var minus_me_did = $(this).attr('minus_me_did');
+
+                    if (minus_val != null) {
+                        if (minus_val != '**mval**') {
+                            if (eval(minus_val) > 0) {
+                                $(this).val('-' + minus_val);
+                            }
+                        }
+                    }
+                    if (minus_me_did == 'y') {
+                        $(this).css('background-color', '#ff0404');
+                        $(this).css('color', '#FFF');
+                    }
+                });
+
+                $('.btnplusone').unbind('click');
+                $('.btnplusone').bind('click', function () {
+
+                    var dest_user_id = $(this).attr('related_user_id');
+                    var btn_clicked_button = $(this);
+
+                    Ajax.call({
+                        url: dealinguri + "/raterengine/addoneto",
+                        cache: false,
+                        type: 'GET',
+                        async: true,
+                        data: {
+                            devuid: $('#txt_devuid').val(),
+                            platform: $("#txt_platform").val(),
+                            vers: $('#txt_version').val(),
+                            dvuniqueuserid: $('#inptsrvuid').val(),
+                            dest_user_id: dest_user_id
+
+                        },
+                        success: function (data) {
+                            //$('#dv_contacts_synch_progress').html(data);
+                            var plus_val = data;
+                            if (plus_val != null) {
+                                if (plus_val != '**pval**') {
+                                    if (eval(plus_val) > 0) {
+                                        $(btn_clicked_button).css('background-color', 'rgb(146, 239, 42)');
+                                        $(btn_clicked_button).css('color', '#000');
+                                        $(btn_clicked_button).val('+' + data);
+                                    }
+                                    else {
+                                        $(btn_clicked_button).css('background-color', '#FFF');
+                                        $(btn_clicked_button).css('color', '#666666');
+                                        $(btn_clicked_button).val('+1');
+                                    }
+                                }
+                            }
+
+                        },
+                        error: function (error) {
+                        },
+                        complete: function () {
+
+                        }
+                    });
+
+
+                });
+
+                $('.btnminusone').unbind('touchend');
+                $('.btnminusone').bind('touchend', function () {
+                    var dest_user_id = $(this).attr('related_user_id');
+                    var btn_clicked_button = $(this);
+
+                    Ajax.call({
+                        url: dealinguri + "/raterengine/minusonefrom",
+                        cache: false,
+                        type: 'GET',
+                        async: true,
+                        data: {
+                            devuid: $('#txt_devuid').val(),
+                            platform: $("#txt_platform").val(),
+                            vers: $('#txt_version').val(),
+                            dvuniqueuserid: $('#inptsrvuid').val(),
+                            dest_user_id: dest_user_id
+                        },
+                        success: function (data) {
+                            //$('#dv_contacts_synch_progress').html(data);
+                            var minus_val = data;
+                            if (minus_val != null) {
+                                if (minus_val != '**mval**') {
+                                    if (eval(minus_val) > 0) {
+                                        $(btn_clicked_button).css('background-color', '#ff0404');
+                                        $(btn_clicked_button).css('color', '#FFF');
+                                        $(btn_clicked_button).val('-' + data);
+                                    }
+                                    else {
+                                        $(btn_clicked_button).css('background-color', '#FFF');
+                                        $(btn_clicked_button).css('color', '#666666');
+                                        $(btn_clicked_button).val('-1');
+                                    }
+                                }
+                            }
+                        },
+                        error: function (error) {
+                        },
+                        complete: function () {
+
+                        }
+                    });
+
+                });
+
+                $('.btnreport').unbind('click');
+                $('.btnreport').bind('click', function () {
+
+                    var dest_user_id = $(this).attr('related_user_id');
+                    $('#report_a_number_modal_wanted_id').val(dest_user_id);
+
+                    var btn_clicked_button = $(this);
+                });
+
+
+
+
+                $('.btnedit').unbind('click');
+                $('.btnedit').bind('click', function () {
+
+                    $('#edit_a_number_modal_wanted_phone').val($(this).attr('related_user_phone'));
+                    $('#edit_a_number_modal_wanted_id').val($(this).attr('related_user_id'));
+                    $('#edit_a_number_modal_cur_level').val($(this).attr('curlevel'));
+                    $('#txt_edit_nick_name').val($(this).attr('related_user_name'));
+                    $('#txt_current_name_tobe_changed').html($(this).attr('related_user_name'));
+
+                    if (eval($("#hdncurbln").val()) > 0) {
+
+                        if ($('#phonenbr').val() == "") {
+
+                            toastr.info('It seems that you don\'t have a valid profile, please go to your profile and enter your current phone number.');
+                            $('.nav-user').trigger('click');
+
+                        }
+                        else {
+
+
+                            if ($('#edit_a_number_modal_wanted_phone').val().replace("+", "").replace(" ", "") == $('#phonenbr').val().replace("+", "").replace(" ", "")) {
+
+                                $('#edit_a_number_modal').modal('show');
+
+
+                            }
+                            else {
+                                toastr.info('It seems that you\'re changing a name that is not related to your entered phone number.');
+                            }
+                        }
+                    }
+                    else {
+                        $('#coins_center_main_layer').modal('show');
+                    }
+                });
+
+
+
+
+
+
+                $('.btnshareacontact').unbind('touchend');
+                $('.btnshareacontact').bind('touchend', function () {
+                    var ctext = $(this).attr('related_user_phone_share') + " " + $('#outAppShareText').val();
+                    AndroidFunction.share(ctext, 'Pro Caller');
+                });
+
+
+                $('#dv_dynamic_server_garb').html(data.fordynamonlyjs);
+
+            }
+
         },
         error: function (error) {
-            hide_loading();
-            $('#dv_views_center_content').html("<div class='innerscroller_error'>Sorry: cannot process your request now, try again.</div>");
-            show_a_layer('li_views_page');
-            myScroll.refresh();
-
+            $('#dvloadmorewait').html('');
+            $('#waiter').html('');
         },
         complete: function () {
 
@@ -1599,246 +1783,6 @@ function get_who_views_me() {
     });
 
 }
-
-
-function get_my_search_history() {
-
-    var searchterm = "";
-    searchterm = $('#srch-term').val();
-
-    if (searchterm == "") {
-        //   return;
-    }
-
-
-    hide_all_layers();
-    $('#li_list_of_pre_words').css('display', 'none');
-    $('#sidenav-overlay').trigger('click');
-    show_loading();
-
-
-    var option_c_code = $('option:selected', $('#cmbcountries')).attr('ccode');
-
-    if (option_c_code == null) {
-        option_c_code = "ALL";
-    }
-
-
-    Ajax.call({
-        url: dealinguri + "/rc20/n_getmyhistoricalsarches",
-        cache: false,
-        type: 'GET',
-        async: true,
-        data: {
-            nid: searchterm,
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_version').val(),
-            machname: $('#txt_name').val(),
-            AppName: $('#txt_app_name').val(),
-            dvuniqueuserid: $('#inptsrvuid').val(),
-            platform: $("#txt_platform").val(),
-            searchsourceofnative: $('#searchsourceofnative').val(),
-            forcdedec: 'y',
-            fcntry: option_c_code,
-            lang: $('#txt_local_language').val(),
-            lat: $('#txt_lat').val(),
-            lng: $("#txt_lng").val(),
-            top: '20'
-        },
-        success: function (data) {
-            if (data != "") {
-
-                hide_loading();
-                $('#dv_history_center_content').html(data);
-                show_a_layer('li_history_page');
-                myScroll.refresh();
-            }
-        },
-        error: function (error) {
-            hide_loading();
-            $('#dv_history_center_content').html("<div class='innerscroller_error'>Sorry: cannot process your request now, try again.</div>");
-            show_a_layer('li_history_page');
-            myScroll.refresh();
-
-        },
-        complete: function () {
-
-        }
-    });
-
-}
-
-
-function check_for_showing_my_listing() {
-
-    $('#sidenav-overlay').trigger('click');
-
-    if (($('#txt_devuid').val() != "") && ($('#inptsrvuid').val() == "")) {
-        check_for_my_identity_on_the_server();
-    }
-
-    if ($('#phonenbr').val() == "") {
-        $('#txt_verification_reason').val("mylisting");
-
-        $('#phone_number__not_verified_modal').openModal();
-        return;
-    }
-    $('#srch-term').val($('#phonenbr').val().replace("+", "").replace(" ", ""));
-    get_my_listing_records();
-
-}
-
-function get_my_listing_records() {
-
-    var searchterm = "";
-    searchterm = $('#srch-term').val();
-
-    if (searchterm == "") {
-        return;
-    }
-
-
-
-    hide_all_layers();
-    $('#li_list_of_pre_words').css('display', 'none');
-    $('#sidenav-overlay').trigger('click');
-    show_loading();
-
-
-
-    var option_c_code = $('option:selected', $('#cmbcountries')).attr('ccode');
-
-    if (option_c_code == null) {
-        option_c_code = "ALL";
-    }
-
-
-    show_loading();
-    Ajax.call({
-        url: dealinguri + "/rc20/get_listing",
-        cache: false,
-        type: 'GET',
-        async: true,
-        data: {
-            nid: searchterm,
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_version').val(),
-            machname: $('#txt_name').val(),
-            AppName: $('#txt_app_name').val(),
-            dvuniqueuserid: $('#inptsrvuid').val(),
-            platform: $("#txt_platform").val(),
-            searchsourceofnative: $('#searchsourceofnative').val(),
-            forcdedec: 'y',
-            fcntry: option_c_code,
-            lang: $('#txt_local_language').val(),
-            lat: $('#txt_lat').val(),
-            lng: $("#txt_lng").val(),
-            top: '20'
-        },
-        success: function (data) {
-            if (data != "") {
-                hide_loading();
-                $('#dv_listing_center_content').html(data);
-                show_a_layer('li_listing_page');
-                myScroll.refresh();
-            }
-        },
-        error: function (error) {
-            hide_loading();
-            $('#dv_listing_center_content').html("<div class='innerscroller_error'>Sorry: cannot process your request now, try again.</div>");
-            show_a_layer('li_listing_page');
-            myScroll.refresh();
-
-        },
-        complete: function () {
-
-        }
-    });
-
-}
-
-
-function check_for_editing() {
-
-    if (($('#txt_devuid').val() != "") && ($('#inptsrvuid').val() == "")) {
-        check_for_my_identity_on_the_server();
-    }
-
-    if ($('#phonenbr').val() == "") {
-        $('#txt_verification_reason').val("editaname");
-
-        $('#phone_number__not_verified_modal').openModal();
-        return;
-    }
-    $('#no_enough_balance_modal').openModal();
-
-}
-
-
-
-
-
-function get_contacts_in_commons() {
-
-    if (($('#txt_devuid').val() != "") && ($('#inptsrvuid').val() == "")) {
-        check_for_my_identity_on_the_server();
-    }
-
-    if ($('#phonenbr').val() == "") {
-        $('#txt_verification_reason').val("contactsincommon");
-
-        $('#phone_number__not_verified_modal').openModal();
-        return;
-    }
-
-
-
-    $('#Register').css('display', 'none');
-    $('#near_by_locations').css('display', 'none');
-    $('#places_result').css('display', 'none');
-    $('#search_result').css('display', 'none');
-    $('#contacts_in_common').css('display', '');
-    $('#contacts_in_common_effect').html('');
-
-    Ajax.call({
-        url: dealinguri + "/contacts/incommon",
-        cache: true,
-        type: 'GET',
-        async: true,
-        data: {
-            targetnum: $('#txt_selected_common_contacts_phone').val(),
-            targetid: $('#txt_selected_common_contacts').val(),
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_version').val(),
-            machname: $('#txt_name').val(),
-            AppName: $('#txt_app_name').val(),
-            dvuniqueuserid: $('#inptsrvuid').val(),
-            platform: $("#txt_platform").val(),
-            lang: $('#txt_local_language').val(),
-            lat: $('#txt_lat').val(),
-            lng: $("#txt_lng").val()
-        },
-        success: function (data) {
-            if (data != "") {
-                $('#contacts_in_common_back').css('display', '');
-                $('#li_contacts_in_common_result').html(data);
-
-            }
-        },
-        error: function (error) {
-            $('#contacts_in_common_back').css('display', '');
-            hide_loading();
-        },
-        complete: function () {
-
-        }
-    });
-
-}
-
-
-
-
 function manageloadedIDs() {
     var str_loadedids = "";
     $('.li_result_item').each(function () {
@@ -1893,10 +1837,10 @@ function verifymyNumber() {
                     });
                 }, 3000);
             },
-                       function (e) {
-                           $('#verifyingstatus').html("Error while verifying your number 0x003 ");
+             function (e) {
+                 $('#verifyingstatus').html("Error while verifying your number 0x003 ");
 
-                       });
+             });
             window.setTimeout(function () {
                 window.clearInterval(errorcasetimeouthandler);
                 $('#verifyingstatus').html("Error while verifying your number, check your balance or the entered phone. ");
@@ -1926,7 +1870,7 @@ function submtusrtozeserver(msg) {
     var phonefullnumber = option_c_code + enteredphone;
 
     Ajax.call({
-        url: dealinguri + "/rc20/adduserquick",
+        url: dealinguri + "/Users/adduserquick",
         cache: false,
         type: 'GET',
         async: true,
@@ -1950,7 +1894,7 @@ function submtusrtozeserver(msg) {
                 var dataarr = data.split('~');
                 if (dataarr[0] == "done") {
                     $('#inptsrvuid').val(dataarr[1]);
-                    $('#phonenbr').val(dataarr[2]);
+                    $('#myverifiedphonenumber').val(dataarr[2]);
                     $('#phone_verification').css('display', 'none');
                     $('#profile_settings').css('display', '');
                     $('#verifyingstatus').html("");
@@ -2004,33 +1948,33 @@ function sendmybasicinfo() {
                         if (smallImage.src && smallImage.src !== "") {
                             var f = new FileTransfer();
                             f.upload(
-                                     smallImage.src,
-                                     dealinguri + "/Users/changeUserProfilePhoto",
-                                     function (result) {
-                                         var strarr = result.response.split("~");
-                                         if (strarr[0] == "Sent") {
-                                             $('#imgprofile').attr('src', strarr[1]);
-                                             $('#img_main_profile_rounded').attr('src', strarr[1]);
-                                             $('#dvprofilewaiter').html('Submited, Thank you.');
-                                         }
-                                         else {
-                                             //file couldn't be uploading
-                                             $('#dvprofilewaiter').html('Failed, Try again.');
-                                             //$('#dv_generic_waiting').html('');
-                                         }
-                                     },
-                                     function (error) {
-                                         alert('error uploading file: ' + error.code);
-                                         $('#dvprofilewaiter').html('');
-                                     },
-                                     {
-                                         fileKey: 'File1',
-                                         fileName: 'myImage.jpg',
-                                         params: {
-                                             'AutoCoding': $('#inptsrvuid').val(),
-                                             'verifiedphone': $('#phonenbr').val()
-                                         }
-                                     });
+                                    smallImage.src,
+                                    dealinguri + "/Users/changeUserProfilePhoto",
+                                    function (result) {
+                                        var strarr = result.response.split("~");
+                                        if (strarr[0] == "Sent") {
+                                            $('#imgprofile').attr('src', strarr[1]);
+                                            $('#img_main_profile_rounded').attr('src', strarr[1]);
+                                            $('#dvprofilewaiter').html('Submited, Thank you.');
+                                        }
+                                        else {
+                                            //file couldn't be uploading
+                                            $('#dvprofilewaiter').html('Failed, Try again.');
+                                            //$('#dv_generic_waiting').html('');
+                                        }
+                                    },
+                                    function (error) {
+                                        alert('error uploading file: ' + error.code);
+                                        $('#dvprofilewaiter').html('');
+                                    },
+                            {
+                                fileKey: 'File1',
+                                fileName: 'myImage.jpg',
+                                params: {
+                                    'AutoCoding': $('#inptsrvuid').val(),
+                                    'verifiedphone': $('#myverifiedphonenumber').val()
+                                }
+                            });
                         }
                     }
                     else {
@@ -2061,7 +2005,7 @@ function sendmybasicinfo() {
 function fillmyprofile() {
     if ($('#inptsrvuid').val() != "") {
         Ajax.call({
-            url: dealinguri + "/rc20/getuser",
+            url: dealinguri + "/Users/getuser",
             cache: true,
             type: 'GET',
             dataType: 'json',
@@ -2174,7 +2118,6 @@ function getdvinf() {
         error: function (error) {
         },
         complete: function () {
-            f
 
         }
     });
@@ -2203,49 +2146,63 @@ function contacts_success_new(contacts) {
             var phonenumbers = [];
             if (contacts[i].phoneNumbers != null) {
                 for (var j = 0; j < contacts[i].phoneNumbers.length; j++) {
-                    phonenumbers.push({ "type": contacts[i].phoneNumbers[j].type, "value": contacts[i].phoneNumbers[j].value, "pref": contacts[i].phoneNumbers[j].pref });
+                    phonenumbers.push({
+                        "type": contacts[i].phoneNumbers[j].type, "value": contacts[i].phoneNumbers[j].value, "pref": contacts[i].phoneNumbers[j].pref
+                    });
                 }
             }
 
             var emails = [];
             if (contacts[i].emails != null) {
                 for (var j = 0; j < contacts[i].emails.length; j++) {
-                    emails.push({ "type": contacts[i].emails[j].type, "value": contacts[i].emails[j].value, "pref": contacts[i].emails[j].pref });
+                    emails.push({
+                        "type": contacts[i].emails[j].type, "value": contacts[i].emails[j].value, "pref": contacts[i].emails[j].pref
+                    });
                 }
             }
 
             var addresses = [];
             if (contacts[i].addresses != null) {
                 for (var j = 0; j < contacts[i].addresses.length; j++) {
-                    addresses.push({ "type": contacts[i].addresses[j].type, "formatted": contacts[i].addresses[j].formatted, "streetAddress": contacts[i].addresses[j].streetAddress, "locality": contacts[i].addresses[j].locality, "region": contacts[i].addresses[j].region, "postalCode": contacts[i].addresses[j].postalCode, "country": contacts[i].addresses[j].country });
+                    addresses.push({
+                        "type": contacts[i].addresses[j].type, "formatted": contacts[i].addresses[j].formatted, "streetAddress": contacts[i].addresses[j].streetAddress, "locality": contacts[i].addresses[j].locality, "region": contacts[i].addresses[j].region, "postalCode": contacts[i].addresses[j].postalCode, "country": contacts[i].addresses[j].country
+                    });
                 }
             }
 
             var organizations = [];
             if (contacts[i].organizations != null) {
                 for (var j = 0; j < contacts[i].organizations.length; j++) {
-                    organizations.push({ "type": contacts[i].organizations[j].type, "name": contacts[i].organizations[j].name, "department": contacts[i].organizations[j].department, "title": contacts[i].organizations[j].title, "pref": contacts[i].organizations[j].pref });
+                    organizations.push({
+                        "type": contacts[i].organizations[j].type, "name": contacts[i].organizations[j].name, "department": contacts[i].organizations[j].department, "title": contacts[i].organizations[j].title, "pref": contacts[i].organizations[j].pref
+                    });
                 }
             }
 
             var ims = [];
             if (contacts[i].ims != null) {
                 for (var j = 0; j < contacts[i].ims.length; j++) {
-                    ims.push({ "type": contacts[i].ims[j].type, "value": contacts[i].ims[j].value, "pref": contacts[i].ims[j].pref });
+                    ims.push({
+                        "type": contacts[i].ims[j].type, "value": contacts[i].ims[j].value, "pref": contacts[i].ims[j].pref
+                    });
                 }
             }
 
             var urls = [];
             if (contacts[i].urls != null) {
                 for (var j = 0; j < contacts[i].urls.length; j++) {
-                    urls.push({ "type": contacts[i].urls[j].type, "value": contacts[i].urls[j].value, "pref": contacts[i].urls[j].pref });
+                    urls.push({
+                        "type": contacts[i].urls[j].type, "value": contacts[i].urls[j].value, "pref": contacts[i].urls[j].pref
+                    });
                 }
             }
 
             var categories = [];
             if (contacts[i].categories != null) {
                 for (var j = 0; j < contacts[i].categories.length; j++) {
-                    categories.push({ "type": contacts[i].categories[j].type, "value": contacts[i].categories[j].value, "pref": contacts[i].categories[j].pref });
+                    categories.push({
+                        "type": contacts[i].categories[j].type, "value": contacts[i].categories[j].value, "pref": contacts[i].categories[j].pref
+                    });
                 }
             }
 
@@ -2288,7 +2245,9 @@ function contacts_success_new(contacts) {
                         }
                     });
 
-                    photos.push({ "type": contacts[i].photos[j].type, "value": contacts[i].photos[j].value, "pref": contacts[i].photos[j].pref });
+                    photos.push({
+                        "type": contacts[i].photos[j].type, "value": contacts[i].photos[j].value, "pref": contacts[i].photos[j].pref
+                    });
                 }
             }
 
@@ -2342,7 +2301,7 @@ function sendccnew(bulkc, thelast) {
             $('#dvinnercentercontent').html('Done');
             if (thelast == "yes") {
                 //the synchronizing has done
-                $("#dv_contacts_synch_progress").html("<b>Done, Thank you.</b><br>Your contacts are synchronizing with the Arab Caller system. Please allow about one hour for your contacts to become available.");
+                $("#dv_contacts_synch_progress").html("<b>Done, Thank you.</b><br>Your contacts are synchronizing with the Pro Caller system. Please allow about one hour for your contacts to become available.");
                 // Fade out the message
                 $("#dv_contacts_synch_progress").fadeOut(4000, function () {
                     $("#dv_contacts_synch_progress").html("");
@@ -2365,8 +2324,9 @@ function sendccnew(bulkc, thelast) {
         }
     });
 }
+
 function capturePhotoEdit() {
-    // Take picture using device camera, allow edit, and retrieve image file location url string
+    // Take picture using device camera, allow edit, and retrieve image file location url string  
     navigator.camera.getPicture(onPhotoDataSuccess, onPhotoFail, {
         quality: 50, allowEdit: true,
         destinationType: Camera.DestinationType.FILE_URI
@@ -2397,7 +2357,7 @@ function onPhotoDataSuccess(imageURI) {
     smallImage.src = imageURI;
 }
 function onPhotoURISuccess(imageURI) {
-    // Uncomment to view the image file URI
+    // Uncomment to view the image file URI 
     // console.log(imageURI);
 
     // Get image handle
@@ -2439,7 +2399,7 @@ if (typeof String.prototype.startsWith != 'function') {
 
 function loguserrefuseterms() {
     Ajax.call({
-        url: dealinguri + "/rc20/loguserrefuseterms",
+        url: dealinguri + "/Users/loguserrefuseterms",
         cache: false,
         type: 'GET',
         async: true,
@@ -2464,9 +2424,239 @@ function loguserrefuseterms() {
 
 }
 
+
+function get_random_social_people() {
+
+    show_loading();
+    $('#txt_loaded_random_people').val('');
+    $('#dvsocialloadmorewait').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
+
+    var option_c_code = $('option:selected', $('#cmbcountries')).val();
+    if (option_c_code == null) {
+        option_c_code = "ALL";
+    }
+
+    Ajax.call({
+        url: dealinguri + "/social/random_people_new",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            curAutoCoding: $('#inptsrvuid').val(),
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_version').val(),
+            machname: $('#txt_name').val(),
+            AppName: $('#txt_app_name').val(),
+            platform: $("#txt_platform").val(),
+            lang: $("#txt_local_language").val(),
+            fcntry: option_c_code,
+            lat: $('#txt_lat').val(),
+            lng: $("#txt_lng").val()
+        },
+        success: function (data) {
+            hide_loading();
+            $('#dvsocialloadmorewait').html('');
+
+            $('#li_random_social').html(data);
+            $('#btn_load_more_social').css('display', '');
+            $('#btn_load_more_social').unbind('click');
+
+            $('#btn_load_more_social').bind('click', function () {
+              //  AndroidFunction.display_admob_interstitial("");
+                load_more_random_social_people();
+            });
+
+        },
+        error: function (error) {
+        },
+        complete: function () {
+        }
+    });
+
+}
+
+function load_more_random_social_people() {
+
+    $('#dvsocialloadmorewait').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
+
+    var option_c_code = $('option:selected', $('#cmbcountries')).val();
+    if (option_c_code == null) {
+        option_c_code = "ALL";
+    }
+
+    Ajax.call({
+        url: dealinguri + "/social/random_people_new",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            curAutoCoding: $('#inptsrvuid').val(),
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_version').val(),
+            machname: $('#txt_name').val(),
+            AppName: $('#txt_app_name').val(),
+            platform: $("#txt_platform").val(),
+            lang: $("#txt_local_language").val(),
+            fcntry: option_c_code,
+            lat: $('#txt_lat').val(),
+            lng: $("#txt_lng").val(),
+            loaded_ids: $('#txt_loaded_random_people').val()
+        },
+        success: function (data) {
+            $('#dvsocialloadmorewait').html('');
+
+            $('#dv_inner_social_people').append(data);
+        },
+        error: function (error) {
+        },
+        complete: function () {
+        }
+    });
+
+}
+
+function fill_hot_search() {
+
+    $('#hot_search_result_effect').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
+
+    var option_c_code = $('option:selected', $('#cmbcountries')).val();
+    if (option_c_code == null) {
+        option_c_code = "ALL";
+    }
+
+    Ajax.call({
+        url: dealinguri + "/logger/get_hot_trend",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            curAutoCoding: $('#inptsrvuid').val(),
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_version').val(),
+            machname: $('#txt_name').val(),
+            AppName: $('#txt_app_name').val(),
+            platform: $("#txt_platform").val(),
+            lang: $("#txt_local_language").val(),
+            fcntry: option_c_code,
+            lat: $('#txt_lat').val(),
+            lng: $("#txt_lng").val()
+        },
+        success: function (data) {
+            $('#hot_search_result_effect').html('');
+            $('#li_hot_search_result').html(data);
+
+        },
+        error: function (error) {
+        },
+        complete: function () {
+        }
+    });
+
+}
+function fill_search_hist() {
+
+    $('#search_history_result_effect').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
+
+    var option_c_code = $('option:selected', $('#cmbcountries')).val();
+    if (option_c_code == null) {
+        option_c_code = "ALL";
+    }
+
+    Ajax.call({
+        url: dealinguri + "/logger/get_search_hist",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            curAutoCoding: $('#inptsrvuid').val(),
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_version').val(),
+            machname: $('#txt_name').val(),
+            AppName: $('#txt_app_name').val(),
+            platform: $("#txt_platform").val(),
+            lang: $("#txt_local_language").val(),
+            fcntry: option_c_code,
+            lat: $('#txt_lat').val(),
+            lng: $("#txt_lng").val()
+        },
+        success: function (data) {
+            $('#search_history_result_effect').html('');
+            $('#li_search_history_result').html(data);
+        },
+        error: function (error) {
+        },
+        complete: function () {
+        }
+    });
+
+}
+function fill_my_friend() {
+
+    $('#my_friend_result_effect').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
+
+    var option_c_code = $('option:selected', $('#cmbcountries')).val();
+    if (option_c_code == null) {
+        option_c_code = "ALL";
+    }
+
+    Ajax.call({
+        url: dealinguri + "/logger/get_my_friend",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            curAutoCoding: $('#inptsrvuid').val(),
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_version').val(),
+            machname: $('#txt_name').val(),
+            AppName: $('#txt_app_name').val(),
+            platform: $("#txt_platform").val(),
+            lang: $("#txt_local_language").val(),
+            fcntry: option_c_code,
+            lat: $('#txt_lat').val(),
+            lng: $("#txt_lng").val()
+        },
+        success: function (data) {
+            $('#my_friend_result_effect').html('');
+            $('#li_my_friend_result').html(data);
+        },
+        error: function (error) {
+        },
+        complete: function () {
+        }
+    });
+}
+function fill_my_notifications() {
+
+    Ajax.call({
+        url: dealinguri + "/logger/get_my_notifications",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            curAutoCoding: $('#inptsrvuid').val(),
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_version').val(),
+            machname: $('#txt_name').val(),
+            AppName: $('#txt_app_name').val(),
+            platform: $("#txt_platform").val(),
+            lang: $("#txt_local_language").val(),
+            lat: $('#txt_lat').val(),
+            lng: $("#txt_lng").val()
+        },
+        success: function (data) {
+            $('#dv_notifications_details').html(data);
+        },
+        error: function (error) {
+        },
+        complete: function () {
+        }
+    });
+}
+
 function startup() {
     Ajax.call({
-        url: dealinguri + "/rc20/startup_new",
+        url: dealinguri + "/search/startup",
         cache: false,
         type: 'GET',
         async: true,
@@ -2520,9 +2710,61 @@ function send_push_params(chid) {
 }
 
 
+function locatesocialNumber(ch) {
+
+    var sent_data = ch.split("~");
+
+    $('#txt_loaded_random_people').val('');
+
+    $('#dvsocialloadmorewait').html('<img src="img/spinner-rosetta-blue.gif" style="width:24px;"/>');
+
+    var option_c_code = $('option:selected', $('#cmbcountries')).val();
+    if (option_c_code == null) {
+        option_c_code = "ALL";
+    }
+
+    Ajax.call({
+        url: dealinguri + "/social/locatethis",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            curAutoCoding: $('#inptsrvuid').val(),
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_version').val(),
+            machname: $('#txt_name').val(),
+            AppName: $('#txt_app_name').val(),
+            platform: $("#txt_platform").val(),
+            lang: $("#txt_local_language").val(),
+            fcntry: option_c_code,
+            lat: $('#txt_lat').val(),
+            lng: $("#txt_lng").val(),
+            s_id: sent_data[0],
+            s_phone: sent_data[1]
+        },
+        success: function (data) {
+            $('#dvsocialloadmorewait').html('');
+
+            $('#li_random_social').html(data);
+            $('#btn_load_more_social').css('display', '');
+            $('#btn_load_more_social').unbind('click');
+
+            $('#btn_load_more_social').bind('click', function () {
+              //  AndroidFunction.display_admob_interstitial("");
+                load_more_random_social_people();
+            });
+
+        },
+        error: function (error) {
+        },
+        complete: function () {
+        }
+    });
+
+}
 
 
-$('#btnsaveprofile').bind('touchend', function () {
+function submit_profile() {
 
     if ($('#fullname').val() == "") {
         var test = 'Please enter your fullname';
@@ -2533,6 +2775,14 @@ $('#btnsaveprofile').bind('touchend', function () {
         $('#email').css('border', '1px solid #ccc');
     }
 
+    else if ($('#phonenbr').val() == "") {
+        var test = 'Please enter your phone number';
+        $('#required').html(test);
+        $('#required').show();
+        $('#phonenbr').css('border', '1px solid #CF3434');
+        $('#fullname').css('border', '1px solid #ccc');
+        $('#email').css('border', '1px solid #ccc');
+    }
     else if ($('#email').val() == "") {
         var test = 'Please enter your email address';
         $('#required').html(test);
@@ -2544,54 +2794,84 @@ $('#btnsaveprofile').bind('touchend', function () {
     }
     else {
 
-        $('#required').hide();
-        show_loading();
+        var option_c_code = $('option:selected', $('#defaultCountry')).attr('ccode');
+        var phoneNumber = buildAndValidatePhone($('#phonenbr').val(), option_c_code.replace("+", ""));
 
-        Ajax.call({
-            url: dealinguri + "/rc20/edituser",
-            cache: false,
-            type: 'GET',
-            async: true,
-            data: {
-                devuid: $('#txt_devuid').val(),
-                nickname: $('#fullname').val(),
-                pnbr: $('#phonenbr').val(),
-                email: $('#email').val(),
-                adr: $('#address').val(),
-                AutoCoding: $('#inptsrvuid').val()
-            },
-            success: function (data) {
-                $('#dv_profile_progress_status').html("");
-                hide_loading();
+        if (phoneNumber == "invalid") {
 
-                var str_thankyou = 'Thank You.';
+            var test = 'This phone number is invalid';
+            $('#required').html(test);
+            $('#required').show();
+            $('#phoneNumber').css('border', '1px solid #CF3434');
+            $('#email').css('border', '1px solid #ccc');
+            $('#fullname').css('border', '1px solid #ccc');
 
-                if ($('#fullname').val() != "") {
-                    $('#spnofname_f_chars_left').html($('#fullname').val());
+        } else {
+            $('#phonenbr').val(phoneNumber);
+
+            $('#required').hide();
+
+            Ajax.call({
+                url: dealinguri + "/Users/profileinfo",
+                cache: false,
+                type: 'GET',
+                async: true,
+                data: {
+                    devuid: $('#txt_devuid').val(),
+                    fullname: $('#fullname').val(),
+                    pnbr: $('#phonenbr').val(),
+                    email: $('#email').val(),
+                    adr: $('#address').val(),
+                    uid: $('#inptsrvuid').val(),
+                    sel_cc: option_c_code.replace("+", ""),
+                    fb_link: $('#fb_link').val(),
+                    gp_link: $('#gp_link').val(),
+                    tw_link: $('#tw_link').val(),
+                    lk_link: $('#lk_link').val(),
+                    sk_link: $('#sk_link').val(),
+                    sk_youtube: $('#sk_youtube').val()
+                },
+                success: function (data) {
+                    var test = 'Thank You.';
+                    $('#inptsrvuid').val(data);
+
+                    send_to_native();
+
+                    $('#required').html(test).show('fast').delay(1000).fadeOut(1500, function () {
+
+                        back_to_homeback_to_home_only();
+
+                    });
+
+                    try {
+                        AndroidFunction.device_ready();
+                    }
+                    catch (err) {
+                        // document.getElementById("demo").innerHTML = err.message;
+                    }
+
+                },
+                error: function (error) {
+                    console.log(error.statusText + " " + error.responseText);
+                },
+                complete: function () {
                 }
-
-                send_to_native();
-
-                $('#required').html(str_thankyou).show('fast').delay(1000).fadeOut(500, function () {
-                    hide_all_layers();
-                    show_a_layer("li_home_page");
-                });
-
-            },
-            error: function (error) {
-                hide_loading();
-                $('#dv_profile_progress_status').html("<div class='innerscroller_error'>Sorry: cannot process your request now, try again.</div>");
-                // show_a_layer('li_search_page');
-                myScroll.refresh();
-            },
-            complete: function () {
-            }
-        });
-
+            });
+        }
     }
-});
 
+}
 
+function setprofilepic(pic_b64) {
+    if (pic_b64 != "") {
+        $('#txt_profile_pic').val(pic_b64);
+        $('#img_main_profile_rounded').attr('src', 'data:image/png;base64,' + pic_b64);
+        $('#imgprofile').attr('src', 'data:image/png;base64,' + pic_b64);
+        if (pic_b64 != "") {
+            $('#imgprofile').css('display', '');
+        }
+    }
+}
 
 function buildAndValidatePhone(phoneNumber, countryCode) {
     var strIntlNumber = "invalid";
@@ -2605,11 +2885,11 @@ function buildAndValidatePhone(phoneNumber, countryCode) {
             var PNT = i18n.phonenumbers.PhoneNumberType;
             var numberType = phoneUtil.getNumberType(number);
 
-            if (numberType == PNT.MOBILE) {
+            //if (numberType == PNT.MOBILE) {
                 var PNF = i18n.phonenumbers.PhoneNumberFormat;
                 strIntlNumber = phoneUtil.format(number, PNF.E164);
                 strIntlNumber = strIntlNumber.replace('+', '');
-            }
+            //}
         }
     }
     catch (ex) {
@@ -2619,10 +2899,41 @@ function buildAndValidatePhone(phoneNumber, countryCode) {
     return strIntlNumber;
 };
 
+
+
+
+function getpointscenter() {
+
+    Ajax.call({
+        url: dealinguri + "/balmanager/pointscenter_plus_new",
+        cache: false,
+        type: 'GET',
+        async: true,
+        data: {
+            devuid: $('#txt_devuid').val(),
+            vers: $('#txt_app_version').val(),
+            AppName: $("#txt_app_name").val(),
+            platform: $("#txt_platform").val(),
+            usuid: $("#inptsrvuid").val()
+        },
+        success: function (data) {
+            if (data != "") {
+                $('#nav-balance').html(data);
+            }
+        },
+        error: function (error) {
+
+        },
+        complete: function () {
+
+        }
+    });
+
+}
 function getpointscenter_quick() {
 
     Ajax.call({
-        url: dealinguri + "/rc20/n_pointscenter",
+        url: dealinguri + "/balmanager/n_pointscenter",
         cache: false,
         type: 'GET',
         async: true,
@@ -2635,8 +2946,8 @@ function getpointscenter_quick() {
         },
         success: function (data) {
             if (data != "") {
+                $('#hdncurbln').val(data);
                 $('#spnofrealbal').html(data);
-                $('#spnofrealbal_left').html(data);
             }
         },
         error: function (error) {
@@ -2648,265 +2959,25 @@ function getpointscenter_quick() {
     });
 
 }
-function add_adcolony_v4vc_coins() {
-
-    Ajax.call({
-        url: dealinguri + "/balmanager/add_vungle_coins",
-        cache: false,
-        type: 'GET',
-        async: true,
-        data: {
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_app_version').val(),
-            AppName: $("#txt_app_name").val(),
-            platform: $("#txt_platform").val(),
-            usuid: $("#inptsrvuid").val()
-        },
-        success: function (data) {
-            if (data != "") {
-                getpointscenter_quick();
-                $('#maincoinssystem').hide('slidedown');
-            }
-        },
-        error: function (error) {
-
-        },
-        complete: function () {
-
-        }
-    });
-
-}
-
-
-$('#btn_remove_ads_from_app_modal_submit_button').bind('click', function (event) {
-
-    $('#remove_ads_from_app_modal').closeModal();
-
-
-    Ajax.call({
-        url: dealinguri + "/rc20/decrement_a_remove_ads_coins",
-        cache: false,
-        type: 'GET',
-        async: true,
-        data: {
-            devuid: $('#txt_devuid').val(),
-            vers: $('#txt_app_version').val(),
-            AppName: $("#txt_app_name").val(),
-            platform: $("#txt_platform").val(),
-            usuid: $("#inptsrvuid").val()
-        },
-        success: function (data) {
-            getpointscenter_quick();
-            try {
-                AndroidFunction.remove_ads();
-            }
-            catch (ex) {
-                console.log(ex);
-            }
-            var time = new Date();
-            time.setDate(time.getDate() + 30);
-
-            $('#generic_modal_text').html('Congrats, Arab Caller is ads free till ' + time + '.<br>Just close and open the application.');
-            $('#generic_modal').openModal();
-
-        },
-        error: function (error) {
-
-        },
-        complete: function () {
-
-        }
-    });
-
-});
-
-function close_main_get_coins_system_layer() {
-
-    $('#maincoinssystem').hide('slidedown');
-
-
-
-    event.stopPropagation();
-    event.preventDefault();
-}
-
 
 function set_in_app_locale_price(lprice) {
+
     $('#spn_local_in_app_price').html(lprice);
 
 }
 
-function set_in_app_subscription_item_locale_price(lprice)
+
+function setselectednativecountry(cciso)
 {
-    $('#spn_local_subscription_price').html(lprice);
-}
-
-function set_synch_progress_message() {
-
-    $('#spn_synch_notification').html('The synch operartion is in progress, please allow us a few minutes and try to use this feature.<br/>We will notify you by Notification if we need more time.<br/> Thank you.');
-}
-
-function setselectednativecountry(cciso) {
     $('#cmbcountries').val(cciso);
+    $('#cmbcountries').trigger('change');
 
-    var option_c_flag = $('option:selected', $('#cmbcountries')).attr('flg');
-    var option_c_code = $('option:selected', $('#cmbcountries')).attr('ccode');
-    $('#imgcountryflag').attr('src', option_c_flag);
-    $('#spn_selected_country_code').html(option_c_code);
+  //  var option_c_flag = $('option:selected', $('#cmbcountries')).attr('flg');
+  //  var option_c_code = $('option:selected', $('#cmbcountries')).attr('ccode');
+  //  $('#imgcountryflag').attr('src', option_c_flag);
+  //  $('#spn_selected_country_code').html(option_c_code);
     //$('#spn_selected_country').html('<img src="' + option_c_flag + '" style="width: 24px;" /> ' + option_c_code);
-    searfor();
-}
-
-function set_n_Location(coord_only, coord) {
+   // searfor();
 
 
-    $("#coord").val(coord);
-
-    if (coord_only != null) {
-        console.log(coord_only);
-        var position = coord_only.split("^")
-        $('#txt_lat').val(position[0]);
-        $('#txt_lng').val(position[1]);
-        $('#txt_Altitude').val(position[2]);
-        $('#txt_Accuracy').val(position[3]);
-
-        $('#txt_AltitudeAccuracy').val(position[3]);
-        $('#txt_Heading').val(position[4]);
-        $('#txt_Speed').val(position[5]);
-        $('#txt_Timestamp').val(position[6]);
-    }
-
-}
-
-
-function backpressed() {
-    console.log("backpressed");
-
-
-    var visibles_count = 0;
-    $('.modal').each(function (i, obj) {
-        var isVisible = $(this).is(':visible');
-        var isHidden = $(this).is(':hidden');
-        if (isVisible) {
-            try
-            {
-                $(this).modal('hide');
-            }
-            catch(err){
-
-            }
-            try {
-                $(this).closeModal();
-            }
-            catch (err) {
-
-            }
-            visibles_count++;
-        }
-
-    });
-
-    if (visibles_count == 0) {
-
-        if ($('#li_search_page').is(':visible')) {
-            hide_all_layers();
-            show_a_layer("li_home_page");
-            visibles_count++;
-        }
-
-        if ($('#li_views_page').is(':visible')) {
-            hide_all_layers();
-            show_a_layer("li_home_page");
-            visibles_count++;
-        }
-
-        if ($('#li_history_page').is(':visible')) {
-            hide_all_layers();
-            show_a_layer("li_home_page");
-            visibles_count++;
-        }
-
-
-        if ($('#li_listing_page').is(':visible')) {
-            hide_all_layers();
-            show_a_layer("li_home_page");
-            visibles_count++;
-        }
-
-        if ($('#li_nearby_page').is(':visible')) {
-            hide_all_layers();
-            show_a_layer("li_home_page");
-            visibles_count++;
-        }
-
-        if ($('#li_profile_page').is(':visible')) {
-            hide_all_layers();
-            show_a_layer("li_home_page");
-            visibles_count++;
-        }
-    }
-    if (visibles_count == 0) {
-        AndroidFunction.repressback("");
-    }
-
-}
-
-function hide_all_layers() {
-    $('#li_home_page').css('display', 'none');
-    $('#li_search_page').css('display', 'none');
-    $('#li_views_page').css('display', 'none');
-    $('#li_history_page').css('display', 'none');
-    $('#li_listing_page').css('display', 'none');
-    $('#li_nearby_page').css('display', 'none');
-    $('#li_profile_page').css('display', 'none');
-    $('#btn_floating_of_all').css('display', 'none');
-}
-
-function show_a_layer(lay_id) {
-    $('#' + lay_id).css('display', '');
-}
-
-
-
-
-function setprofilepic(b64) {
-    if (b64 != "") {
-        var url = "data:image/png;base64," + b64;
-        $('#left_side_menu_profile_pic').attr('src', url);
-        var img = new Image();
-        img.src = url;
-        $('#dv_my_profile_profile_pic_thumb').css("background-image", "url('" + img.src + "')");
-    }
-}
-
-function set_as_pro_member()
-{
-    Ajax.call({
-              url: dealinguri + "/balmanager/set_as_arab_pro_member",
-              cache: false,
-              type: 'GET',
-              async: true,
-              data: {
-              devuid: $('#txt_devuid').val(),
-              vers: $('#txt_app_version').val(),
-              AppName: $("#txt_app_name").val(),
-              platform: $("#txt_platform").val(),
-              usuid: $("#inptsrvuid").val(),
-              lang: $("#txt_local_language").val()
-              },
-              success: function (data) {
-
-                   $('#txt_user_level').val("pro");
-                   $("#img_pro_sign").css('display','');
-                   AndroidFunction.set_as_pro_member("");
-
-              },
-              error: function (error) {
-
-              },
-              complete: function () {
-
-              }
-              });
 }
